@@ -1,0 +1,58 @@
+package token
+
+type TokenType int
+
+const (
+	L_BRACKET TokenType = iota
+	R_BRACKET
+	L_BRACE
+	R_BRACE
+
+	STAR
+	DOT
+	COMMA
+	PLUS
+	MINUS
+	SLASH
+
+	EQUAL
+	EQUAL_EQUAL
+	BANG
+	BANG_EQUAL
+	LESS
+	LESS_EQUAL
+	GREATER
+	GREATER_EQUAL
+
+	AND_AND
+	PIPE_PIPE
+
+	STRING
+	NUMBER
+
+	NEWLINE
+	WHITESPACE
+	COMMENT
+
+	IDENTIFIER
+
+	//Keywords
+
+	FALSE
+	TRUE
+
+	IF
+	ELSE
+	FOR
+	WHILE
+
+	INIT
+	FUNC
+	RETURN
+
+)
+
+type Token struct {
+	tokenType TokenType
+	raw string
+}
