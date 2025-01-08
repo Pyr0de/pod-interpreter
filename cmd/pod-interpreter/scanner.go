@@ -65,15 +65,12 @@ func Tokenize(input string) ([]token.Token, error) {
 			tokens = append(tokens, token.Token{TokenType: token.STAR, Raw: input[start:i+1], Line: line})
 		case '^':
 			tokens = append(tokens, token.Token{TokenType: token.CARET, Raw: input[start:i+1], Line: line})
+		case '%':
+			tokens = append(tokens, token.Token{TokenType: token.PERCENT, Raw: input[start:i+1], Line: line})
 		case ',':
 			tokens = append(tokens, token.Token{TokenType: token.COMMA, Raw: input[start:i+1], Line: line})
 		case ';':
 			tokens = append(tokens, token.Token{TokenType: token.SEMICOLON, Raw: input[start:i+1], Line: line})
-			//case (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_':
-			//	for (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' {
-
-			//	}
-			//	tokens = append(tokens, token.Token{TokenType: token.IDENTIFIER, Raw: input[start:i], Line: line})
 		case '=':
 			switch input[i+1] {
 			case '=':
