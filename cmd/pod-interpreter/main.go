@@ -14,8 +14,12 @@ func main() {
 				fmt.Fprintln(os.Stderr, "Could not read file:", os.Args[2])
 				os.Exit(65)
 			}
-			for _,v := range Tokenize(string(f)) {
+			t, err := Tokenize(string(f))
+			for _,v := range t {
 				v.Display()
+			}
+			if err != nil {
+				os.Exit(65)
 			}
 			return
 		}

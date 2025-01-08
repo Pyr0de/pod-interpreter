@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -8,9 +9,9 @@ import (
 	"github.com/Pyr0de/pod-interpreter/cmd/token"
 )
 
-func Tokenize(input string) []token.Token {
+func Tokenize(input string) ([]token.Token, error) {
 	tokens := []token.Token {}
-	//err := false
+	err := false
 
 	var line uint = 1
 	for i := 0; i < len(input); i++ {
@@ -115,6 +116,19 @@ func Tokenize(input string) []token.Token {
 			default:
 				tokens = append(tokens, token.Token{TokenType: token.SLASH, Raw: input[start:i+1], Line: line})
 			}
+		case '|', '&': {
+			if c == input[i+1] {
+				i++
+				if c == '&' {
+					tokens = append(tokens, token.Token{TokenType: token.AND_AND, Raw: input[start:i+1], Line: line})
+				}else {
+					tokens = append(tokens, token.Token{TokenType: token.PIPE_PIPE, Raw: input[start:i+1], Line: line})
+				}
+			}else {
+				fmt.Fprintf(os.Stderr, "[line %d] Unexpected character: %s\n", line, input[start:i+1])
+				err = true
+			}
+		}
 		case '"', '\'': {
 			i++
 			for input[i] != c {
@@ -132,12 +146,15 @@ func Tokenize(input string) []token.Token {
 			line++
 		default: {
 			fmt.Fprintf(os.Stderr, "[line %d] Unexpected character: %s\n", line, input[start:i+1])
-			//err = true
+			err = true
 			}
 		}
 	}
 
-	return tokens
+	if err {
+		return tokens, errors.New("Error")
+	}
+	return tokens, nil
 }
 
 func reserved(identifier string) token.TokenType {
