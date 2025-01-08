@@ -1,21 +1,23 @@
 package token
 
+import "fmt"
+
 type TokenType int
 
 const (
-	L_BRACKET TokenType = iota
+	L_BRACKET TokenType = iota //0
 	R_BRACKET
 	L_BRACE
 	R_BRACE
 
-	STAR
+	STAR // 4
 	DOT
 	COMMA
 	PLUS
 	MINUS
 	SLASH
 
-	EQUAL
+	EQUAL // 10
 	EQUAL_EQUAL
 	BANG
 	BANG_EQUAL
@@ -24,35 +26,38 @@ const (
 	GREATER
 	GREATER_EQUAL
 
-	AND_AND
+	AND_AND // 18
 	PIPE_PIPE
 
-	STRING
+	STRING // 20
 	NUMBER
 
-	NEWLINE
+	NEWLINE // 22
 	WHITESPACE
 	COMMENT
 
-	IDENTIFIER
+	IDENTIFIER // 25
 
-	//Keywords
-
-	FALSE
+	FALSE // 26
 	TRUE
 
-	IF
+	IF // 28
 	ELSE
 	FOR
 	WHILE
 
-	INIT
+	INIT // 32
 	FUNC
-	RETURN
+	RETURN // 34
 
 )
 
 type Token struct {
-	tokenType TokenType
+	TokenType TokenType
 	raw string
+	Value interface{}
+}
+
+func (t Token)display() {
+	fmt.Println(t.TokenType, t.raw, t.Value)
 }
