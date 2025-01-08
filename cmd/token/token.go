@@ -16,6 +16,7 @@ const (
 	PLUS
 	MINUS
 	SLASH
+	CARET
 
 	EQUAL
 	EQUAL_EQUAL
@@ -55,8 +56,9 @@ type Token struct {
 	TokenType TokenType
 	Raw string
 	Value interface{}
+	Line uint
 }
 
 func (t Token)Display() {
-	fmt.Println(t.TokenType, t.Raw, t.Value)
+	fmt.Println(t.TokenType, t.Raw, t.Value, t.Line)
 }
