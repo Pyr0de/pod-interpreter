@@ -38,15 +38,24 @@ func Tokenize(input string) []token.Token {
 				i++
 			}
 			i--
-			tokens = append(tokens, token.Token{TokenType: token.IDENTIFIER, Raw: input[start:i+1], Value: input[start:i+1], Line: line})
+			token_type := reserved(input[start:i+1])
+			if token_type == token.IDENTIFIER {
+				tokens = append(tokens, token.Token{TokenType: token.IDENTIFIER, Raw: input[start:i+1], Value: input[start:i+1], Line: line})
+			}else {
+				tokens = append(tokens, token.Token{TokenType: token_type, Raw: input[start:i+1], Line: line})
+			}
 			continue
 		}
 
 		switch c {
-			case '(': 
+		case '(': 
 			tokens = append(tokens, token.Token{TokenType: token.L_BRACKET, Raw: input[start:i+1], Line: line})
 		case ')':
 			tokens = append(tokens, token.Token{TokenType: token.R_BRACKET, Raw: input[start:i+1], Line: line})
+		case '{': 
+			tokens = append(tokens, token.Token{TokenType: token.L_BRACE, Raw: input[start:i+1], Line: line})
+		case '}':
+			tokens = append(tokens, token.Token{TokenType: token.R_BRACE, Raw: input[start:i+1], Line: line})
 		case '+':
 			tokens = append(tokens, token.Token{TokenType: token.PLUS, Raw: input[start:i+1], Line: line})
 		case '-':
@@ -118,7 +127,7 @@ func Tokenize(input string) []token.Token {
 			}
 			tokens = append(tokens, token.Token{TokenType: token.STRING, Raw: input[start:i+1], Value: input[start+1:i], Line: line})
 		}
-			
+		case ' ', '\t':
 		case '\n':
 			line++
 		default: {
@@ -129,4 +138,28 @@ func Tokenize(input string) []token.Token {
 	}
 
 	return tokens
+}
+
+func reserved(identifier string) token.TokenType {
+	switch identifier {
+	case "true":
+		return token.TRUE
+	case "false":
+		return token.FALSE
+	case "init":
+		return token.INIT
+	case "if":
+		return token.IF
+	case "else":
+		return token.ELSE
+	case "while":
+		return token.WHILE
+	case "for":
+		return token.FOR
+	case "func":
+		return token.FUNC
+	case "return":
+		return token.RETURN
+	}
+	return token.IDENTIFIER
 }
