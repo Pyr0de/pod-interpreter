@@ -21,7 +21,7 @@ print(sum)
 ### Initialize
 `init`
 ### If and loops
-`if`, `for`, `while`
+`if`, `else`, `for`, `while`
 ### Data types
 `string`, `number`, `true/false`
 ### Other
