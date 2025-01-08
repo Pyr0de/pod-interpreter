@@ -49,15 +49,14 @@ const (
 	INIT // 32
 	FUNC
 	RETURN // 34
-
 )
 
 type Token struct {
 	TokenType TokenType
-	raw string
+	Raw string
 	Value interface{}
 }
 
-func (t Token)display() {
-	fmt.Println(t.TokenType, t.raw, t.Value)
+func (t Token)Display() {
+	fmt.Println(t.TokenType, t.Raw, t.Value)
 }
