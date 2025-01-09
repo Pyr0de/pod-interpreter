@@ -63,3 +63,7 @@ type Token struct {
 func (t Token)Display() {
 	fmt.Println(t.TokenType, t.Raw, t.Value, t.Line)
 }
+
+func (t Token)IsOperator() bool{
+	return t.TokenType >= STAR && t.TokenType <= PIPE_PIPE
+}
