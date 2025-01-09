@@ -32,7 +32,6 @@ func (g *Group)CanAdd(t token.Token) bool{
 		return true
 	}
 
-	
 	return false
 }
 
@@ -54,34 +53,34 @@ func (g *Group)AddToken(t token.Token) {
 func (g Group)String() string {
 	out := ""
 	if g.Operator.TokenType == token.None {
-		out += "group "
+		out += "group"
 	}else {
-		out += g.Operator.Raw + " "
+		out += g.Operator.Raw
 	}
 
 	val1, ok := g.Operand1.(*Group)
 	if ok {
-		out += val1.String()
+		out += " " + val1.String()
 	}else {
 		if v, ok := g.Operand1.(token.Token); ok {
-			out += v.Raw + " "
-		}else {
-			out += "nil "
-		}
-	}
-
-	val2, ok := g.Operand2.(*Group)
-	if ok {
-		out += val2.String()
-	}else {
-		if v, ok := g.Operand2.(token.Token); ok {
-			out += v.Raw + " "
+			out += " " + v.Raw
 		}else {
 			out += "nil"
 		}
 	}
 
+	val2, ok := g.Operand2.(*Group)
+	if ok {
+		out += " " + val2.String()
+	}else {
+		if v, ok := g.Operand2.(token.Token); ok {
+			out += " " + v.Raw
+		}else {
+			out += " nil"
+		}
+	}
 
-	return "(" + out + ") "
+
+	return "(" + out + ")"
 }
 
