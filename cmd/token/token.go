@@ -5,12 +5,14 @@ import "fmt"
 type TokenType int
 
 const (
-	L_BRACKET TokenType = iota //0
+	None TokenType = iota
+
+	L_BRACKET
 	R_BRACKET
 	L_BRACE
 	R_BRACE
 
-	STAR // 4
+	STAR
 	COMMA
 	SEMICOLON
 	PLUS
@@ -19,7 +21,7 @@ const (
 	CARET
 	PERCENT
 
-	EQUAL // 12
+	EQUAL
 	EQUAL_EQUAL
 	BANG
 	BANG_EQUAL
@@ -28,29 +30,29 @@ const (
 	GREATER
 	GREATER_EQUAL
 
-	AND_AND // 20
+	AND_AND
 	PIPE_PIPE
 
-	STRING // 22
+	STRING
 	NUMBER
 
-	NEWLINE
-	WHITESPACE
-	COMMENT
+	IDENTIFIER
 
-	IDENTIFIER // 27
-
-	FALSE //28
+	FALSE
 	TRUE
 
-	IF // 30
+	IF
 	ELSE
 	FOR
 	WHILE
 
-	INIT // 34
+	INIT
 	FUNC
 	RETURN
+
+	NEWLINE
+	WHITESPACE
+	COMMENT
 )
 
 type Token struct {
@@ -66,4 +68,8 @@ func (t Token)Display() {
 
 func (t Token)IsOperator() bool{
 	return t.TokenType >= STAR && t.TokenType <= PIPE_PIPE
+}
+
+func (t Token)IsOperand() bool {
+	return t.TokenType >= STRING && t.TokenType <= TRUE
 }
