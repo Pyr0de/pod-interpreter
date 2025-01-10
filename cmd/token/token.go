@@ -13,14 +13,7 @@ const (
 	R_BRACE
 
 	SEMICOLON
-
-	STAR
 	COMMA
-	PLUS
-	MINUS
-	SLASH
-	CARET
-	PERCENT
 
 	EQUAL
 	EQUAL_EQUAL
@@ -33,6 +26,15 @@ const (
 
 	AND_AND
 	PIPE_PIPE
+
+	PLUS
+	MINUS
+
+	STAR
+	SLASH
+	PERCENT
+
+	CARET
 
 	STRING
 	NUMBER
@@ -68,7 +70,7 @@ func (t Token)Display() {
 }
 
 func (t Token)IsOperator() bool{
-	return t.TokenType >= STAR && t.TokenType <= PIPE_PIPE
+	return t.TokenType >= EQUAL && t.TokenType <= CARET
 }
 
 func (t Token)IsOperand() bool {
