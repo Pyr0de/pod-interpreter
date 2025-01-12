@@ -18,6 +18,7 @@ func main() {
 				for _,v := range t {
 					v.Display()
 				}
+				fmt.Println("EOF  null")
 				if err != nil {
 					os.Exit(65)
 				}
