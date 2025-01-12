@@ -66,6 +66,14 @@ type Token struct {
 	Line uint
 }
 
+func (t Token)String() string {
+	if t.Value != nil {
+		return fmt.Sprint(t.Value)
+	}else {
+		return t.Raw
+	}
+}
+
 func (t Token)Display() {
 	fmt.Println(t.TokenType, t.Raw, t.Value, t.Line)
 }

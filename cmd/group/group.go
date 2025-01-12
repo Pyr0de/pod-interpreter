@@ -13,6 +13,12 @@ type Group struct {
 
 
 func (g Group)String() string {
+	if g.Operand2 == nil && g.Operator.TokenType == token.None && g.Operand1 != nil && g.Parent == nil{
+		if v, ok := g.Operand1.(token.Token); ok {
+			return v.String()
+		}
+	}
+
 	out := ""
 	if g.Operator.TokenType == token.None {
 		out += "group"
@@ -20,28 +26,21 @@ func (g Group)String() string {
 		out += g.Operator.Raw
 	}
 
-	val1, ok := g.Operand1.(*Group)
-	if ok {
-		out += " " + val1.String()
+	if v, ok := g.Operand1.(*Group); ok {
+		out += " " + v.String()
+	}else if v, ok := g.Operand1.(token.Token); ok {
+		out += " " + v.String()
 	}else {
-		if v, ok := g.Operand1.(token.Token); ok {
-			out += " " + v.Raw
-		}else {
-			out += " nil"
-		}
+		out += " null"
 	}
 
-	val2, ok := g.Operand2.(*Group)
-	if ok {
-		out += " " + val2.String()
+	if v, ok := g.Operand2.(*Group); ok {
+		out += " " + v.String()
+	}else if v, ok := g.Operand2.(token.Token); ok {
+		out += " " + v.String()
 	}else {
-		if v, ok := g.Operand2.(token.Token); ok {
-			out += " " + v.Raw
-		}else {
-			out += " nil"
-		}
+		out += " null"
 	}
-
 
 	return "(" + out + ")"
 }
