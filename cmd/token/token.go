@@ -29,6 +29,7 @@ const (
 
 	PLUS
 	MINUS
+	NEG
 
 	STAR
 	SLASH
@@ -75,4 +76,8 @@ func (t Token)IsOperator() bool{
 
 func (t Token)IsOperand() bool {
 	return t.TokenType >= STRING && t.TokenType <= TRUE
+}
+
+func (t Token)IsUnary() bool {
+	return t.TokenType == BANG || t.TokenType == NEG 
 }

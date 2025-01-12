@@ -54,8 +54,13 @@ func Tokenize(input string) ([]token.Token, error) {
 			tokens = append(tokens, token.Token{TokenType: token.R_BRACE, Raw: input[start:i+1], Line: line})
 		case '+':
 			tokens = append(tokens, token.Token{TokenType: token.PLUS, Raw: input[start:i+1], Line: line})
-		case '-':
-			tokens = append(tokens, token.Token{TokenType: token.MINUS, Raw: input[start:i+1], Line: line})
+		case '-': {
+			if len(tokens) == 0 || !tokens[len(tokens)-1].IsOperand() {
+				tokens = append(tokens, token.Token{TokenType: token.NEG, Raw: input[start:i+1], Line: line})
+			}else {
+				tokens = append(tokens, token.Token{TokenType: token.MINUS, Raw: input[start:i+1], Line: line})
+			}
+		}
 		case '*':
 			tokens = append(tokens, token.Token{TokenType: token.STAR, Raw: input[start:i+1], Line: line})
 		case '^':
