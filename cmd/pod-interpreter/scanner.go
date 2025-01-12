@@ -132,6 +132,7 @@ func Tokenize(input string) ([]token.Token, error) {
 				if input[i] == '\n' {
 					i--
 					fmt.Fprintf(os.Stderr, "[line %d] Unterminated String: %s\n", line, input[start:i+1])
+					err = true
 					break
 				}
 				i++
@@ -149,7 +150,7 @@ func Tokenize(input string) ([]token.Token, error) {
 	}
 
 	if err {
-		return tokens, errors.New("Error")
+		return tokens, errors.New("Error Tokenizer")
 	}
 	return tokens, nil
 }
