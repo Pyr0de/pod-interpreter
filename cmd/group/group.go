@@ -45,3 +45,6 @@ func (g Group)String() string {
 	return "(" + out + ")"
 }
 
+func (g Group)Empty() bool{
+	return g.Operand1 == nil && g.Operand2 == nil && g.Operator.TokenType == 0
+}
