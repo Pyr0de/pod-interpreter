@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/Pyr0de/pod-interpreter/cmd/group"
 	"github.com/Pyr0de/pod-interpreter/cmd/token"
@@ -21,7 +22,9 @@ func Parse(tokens []token.Token) []group.Group {
 				result = append(result, stack[len(stack)-1])
 				stack = stack[:len(stack)-1]
 			}
-			exp = append(exp, togroup(result))
+			if len(result) > 0 {
+				exp = append(exp, togroup(result))
+			}
 			result = []token.Token {}
 		}else if k.IsOperand() {
 			result = append(result, k)
@@ -45,7 +48,6 @@ func Parse(tokens []token.Token) []group.Group {
 				result = append(result, stack[len(stack)-1])
 				stack = stack[:len(stack)-1]
 			}
-
 			stack = append(stack, k)
 		}
 	}
@@ -53,7 +55,9 @@ func Parse(tokens []token.Token) []group.Group {
 		result = append(result, stack[len(stack)-1])
 		stack = stack[:len(stack)-1]
 	}
-	exp = append(exp, togroup(result))
+	if len(result) > 0 {
+		exp = append(exp, togroup(result))
+	}
 
 	return exp
 }
@@ -75,85 +79,72 @@ func precedence(t token.Token) uint{
 	return 0
 }
 
+
 func togroup(postfix []token.Token) group.Group {
-	var start_group *group.Group = &group.Group{}
-	var curr_group *group.Group = start_group
-	fmt.Println(postfix)
 	if len(postfix) == 1 {
 		return group.Group{Operand1: postfix[0]}
 	}
+
+	var start *group.Group = &group.Group{}
+	groups := grouper{Start_group: start, Curr_group: start}
+
 	for i := len(postfix)-1; i >= 0; i-- {
 		if postfix[i].IsOperator() {
-			if start_group != nil {
-				g := &group.Group{Parent: curr_group, Operator: postfix[i]}
-				if curr_group.Operand1 == nil {
-					curr_group.Operand1 = g
-				}else if curr_group.Operand2 == nil && !curr_group.Operator.IsUnary(){
-					curr_group.Operand2 = curr_group.Operand1
-					curr_group.Operand1 = g
-				}else {
-					panic(fmt.Sprintf("Error parsing postfix: %s", curr_group))
-				}
-				curr_group = g
-			}else {
-				start_group = &group.Group{Operator: postfix[i]}
-				curr_group = start_group
-			}
+			g := &group.Group{Parent: groups.Curr_group, Operator: postfix[i]}
+			groups.add_to_curr(g)
+			groups.Curr_group = g
 		}else if postfix[i].IsOperand() {
-				if curr_group.Operand1 == nil {
-					curr_group.Operand1 = postfix[i]
-					for curr_group.Operand1 != nil &&
-						(curr_group.Operand2 != nil || curr_group.Operator.IsUnary()) &&
-						curr_group.Parent != nil{
-						curr_group = curr_group.Parent
-					}
-				}else if curr_group.Operand2 == nil && !curr_group.Operator.IsUnary() {
-					curr_group.Operand2 = curr_group.Operand1
-					curr_group.Operand1 = postfix[i]
-					for curr_group.Operand1 != nil &&
-						(curr_group.Operand2 != nil || curr_group.Operator.IsUnary()) &&
-						curr_group.Parent != nil{
-						curr_group = curr_group.Parent
-					}
-				}else {
-					panic(fmt.Sprintf("Error parsing postfix: %s", curr_group))
-				}
-
+			groups.add_to_curr(postfix[i])
+			groups.back()
 		}else if postfix[i].TokenType == token.R_BRACKET {
-			
-
-			if start_group != nil {
-				g := &group.Group{Parent: curr_group}
-				if curr_group.Operand1 == nil {
-					curr_group.Operand1 = g
-				}else if curr_group.Operand2 == nil && !curr_group.Operator.IsUnary(){
-					curr_group.Operand2 = curr_group.Operand1
-					curr_group.Operand1 = g
-				}else {
-					panic(fmt.Sprintf("Error parsing postfix: %s", curr_group))
-				}
-				curr_group = g
-			}else {
-				start_group = &group.Group{}
-				curr_group = start_group
-			}
-
+			g := &group.Group{Parent: groups.Curr_group}
+			groups.add_to_curr(g)
+			groups.Curr_group = g
 		}else if postfix[i].TokenType == token.L_BRACKET {
-			if curr_group.Parent != nil {
-				curr_group = curr_group.Parent
+			if groups.Curr_group.Parent != nil {
+				groups.Curr_group = groups.Curr_group.Parent
 			}
-			for curr_group.Operand1 != nil &&
-				(curr_group.Operand2 != nil || curr_group.Operator.IsUnary()) &&
-				curr_group.Parent != nil{
-				curr_group = curr_group.Parent
+			if !groups.curr_is_full() {
+				fmt.Fprintf(os.Stderr, "[line %d] Error at '%s': Expected expression\n", postfix[i].Line, postfix[i].Raw)
 			}
+			groups.back()
 		}else {
 			panic("Found something other than operator or operand")
 		}
 	}
-	if v, ok := start_group.Operand1.(*group.Group); ok {
+	if !groups.curr_is_full() {
+		fmt.Fprintf(os.Stderr, "[line %d] Error at '%s': Expected expression\n", postfix[len(postfix)-1].Line, postfix[len(postfix)-1].Raw)
+	}
+	if v, ok := groups.Start_group.Operand1.(*group.Group); ok {
 		return *v
 	}
-	return *start_group
+	return *groups.Start_group
 }
 
+type grouper struct {
+	Start_group *group.Group
+	Curr_group *group.Group
+}
+
+func (grouper *grouper)back() {
+	for grouper.Curr_group.Operand1 != nil &&
+	(grouper.Curr_group.Operand2 != nil || grouper.Curr_group.Operator.IsUnary()) &&
+	grouper.Curr_group.Parent != nil {
+		grouper.Curr_group = grouper.Curr_group.Parent
+	}
+}
+
+func (grouper *grouper)add_to_curr(g any) {
+	if grouper.Curr_group.Operand1 == nil {
+		grouper.Curr_group.Operand1 = g
+	}else if grouper.Curr_group.Operand2 == nil && !grouper.Curr_group.Operator.IsUnary(){
+		grouper.Curr_group.Operand2 = grouper.Curr_group.Operand1
+		grouper.Curr_group.Operand1 = g
+	}else {
+		panic(fmt.Sprintf("Error parsing postfix: %s", grouper.Curr_group))
+	}
+}
+
+func (grouper *grouper)curr_is_full() bool {
+	return grouper.Curr_group.Operand1 != nil && (grouper.Curr_group.Operand2 != nil || grouper.Curr_group.Operator.IsUnary()) && grouper.Start_group.Operator.TokenType != token.None
+}
