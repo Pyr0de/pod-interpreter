@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -9,12 +10,13 @@ import (
 )
 
 
-func Parse(tokens []token.Token) []group.Group {
+
+func Parse(tokens []token.Token) ([]group.Group, error) {
 	exp := []group.Group{}
 
 	stack := []token.Token{}
 	result := []token.Token{}
-
+	err := false
 
 	for i, k := range tokens {
 		if k.TokenType == token.SEMICOLON {
@@ -23,7 +25,12 @@ func Parse(tokens []token.Token) []group.Group {
 				stack = stack[:len(stack)-1]
 			}
 			if len(result) > 0 {
-				exp = append(exp, togroup(result))
+				a, e := togroup(result)
+				if e {
+					err = true
+				}else if !a.Empty(){
+					exp = append(exp, a)
+				}
 			}
 			result = []token.Token {}
 		}else if k.IsOperand() {
@@ -56,10 +63,17 @@ func Parse(tokens []token.Token) []group.Group {
 		stack = stack[:len(stack)-1]
 	}
 	if len(result) > 0 {
-		exp = append(exp, togroup(result))
+		a, e := togroup(result)
+		if e {
+			err = true
+		}else if !a.Empty() {
+			exp = append(exp, a)
+		}
 	}
-
-	return exp
+	if err {
+		return exp, errors.New("Error Parser")
+	}
+	return exp, nil
 }
 
 func precedence(t token.Token) uint{
@@ -80,15 +94,16 @@ func precedence(t token.Token) uint{
 }
 
 
-func togroup(postfix []token.Token) group.Group {
-	if len(postfix) == 1 {
-		return group.Group{Operand1: postfix[0]}
+func togroup(postfix []token.Token) (group.Group, bool) {
+	if len(postfix) == 1 && postfix[0].IsOperand(){
+		return group.Group{Operand1: postfix[0]}, false
 	}
 
 	var start *group.Group = &group.Group{}
 	groups := grouper{Start_group: start, Curr_group: start}
 
-	for i := len(postfix)-1; i >= 0; i-- {
+	i := len(postfix)-1
+	for ; i >= 0; i-- {
 		if postfix[i].IsOperator() {
 			g := &group.Group{Parent: groups.Curr_group, Operator: postfix[i]}
 			groups.add_to_curr(g)
@@ -101,24 +116,25 @@ func togroup(postfix []token.Token) group.Group {
 			groups.add_to_curr(g)
 			groups.Curr_group = g
 		}else if postfix[i].TokenType == token.L_BRACKET {
+			if !groups.valid() {
+				i--
+				break
+			}
 			if groups.Curr_group.Parent != nil {
 				groups.Curr_group = groups.Curr_group.Parent
-			}
-			if !groups.curr_is_full() {
-				fmt.Fprintf(os.Stderr, "[line %d] Error at '%s': Expected expression\n", postfix[i].Line, postfix[i].Raw)
 			}
 			groups.back()
 		}else {
 			panic("Found something other than operator or operand")
 		}
 	}
-	if !groups.curr_is_full() {
-		fmt.Fprintf(os.Stderr, "[line %d] Error at '%s': Expected expression\n", postfix[len(postfix)-1].Line, postfix[len(postfix)-1].Raw)
+	if !groups.valid() {
+		fmt.Fprintf(os.Stderr, "[line %d] Error at '%s': Expected expression\n", postfix[i+1].Line, postfix[i+1].Raw)
 	}
 	if v, ok := groups.Start_group.Operand1.(*group.Group); ok {
-		return *v
+		return *v, !groups.valid()
 	}
-	return *groups.Start_group
+	return *groups.Start_group, !groups.valid()
 }
 
 type grouper struct {
@@ -145,6 +161,10 @@ func (grouper *grouper)add_to_curr(g any) {
 	}
 }
 
-func (grouper *grouper)curr_is_full() bool {
-	return grouper.Curr_group.Operand1 != nil && (grouper.Curr_group.Operand2 != nil || grouper.Curr_group.Operator.IsUnary()) && grouper.Start_group.Operator.TokenType != token.None
+func (grouper *grouper)valid() bool {
+	if grouper.Curr_group.Operator.TokenType == token.None {
+		return grouper.Curr_group.Operand1 != nil && grouper.Curr_group.Operand2 == nil 
+	}
+	return grouper.Curr_group.Operand1 != nil && (grouper.Curr_group.Operand2 != nil || grouper.Curr_group.Operator.IsUnary())
 }
+
