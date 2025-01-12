@@ -39,12 +39,7 @@ func Tokenize(input string) ([]token.Token, error) {
 				i++
 			}
 			i--
-			token_type := reserved(input[start:i+1])
-			if token_type == token.IDENTIFIER {
-				tokens = append(tokens, token.Token{TokenType: token.IDENTIFIER, Raw: input[start:i+1], Value: input[start:i+1], Line: line})
-			}else {
-				tokens = append(tokens, token.Token{TokenType: token_type, Raw: input[start:i+1], Line: line})
-			}
+			tokens = append(tokens, token.Token{TokenType: reserved(input[start:i+1]), Raw: input[start:i+1], Line: line})
 			continue
 		}
 
@@ -99,9 +94,9 @@ func Tokenize(input string) ([]token.Token, error) {
 			switch input[i+1] {
 			case '=':
 				i++
-				tokens = append(tokens, token.Token{TokenType: token.GREATER_EQUAL, Raw: input[start:i+1], Line: line})
+				tokens = append(tokens, token.Token{TokenType: token.LESS_EQUAL, Raw: input[start:i+1], Line: line})
 			default:
-				tokens = append(tokens, token.Token{TokenType: token.GREATER, Raw: input[start:i+1], Line: line})
+				tokens = append(tokens, token.Token{TokenType: token.LESS, Raw: input[start:i+1], Line: line})
 			}
 		case '/':
 			switch input[i+1] {

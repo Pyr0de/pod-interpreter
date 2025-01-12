@@ -11,9 +11,6 @@ import (
 func Parse(tokens []token.Token) []group.Group {
 	exp := []group.Group{}
 
-	//var start_group *group.Group = nil
-	//var curr_group *group.Group = nil
-
 	stack := []token.Token{}
 	result := []token.Token{}
 
@@ -23,7 +20,7 @@ func Parse(tokens []token.Token) []group.Group {
 				result = append(result, stack[len(stack)-1])
 				stack = stack[:len(stack)-1]
 			}
-			fmt.Println(togroup(result))
+			exp = append(exp, togroup(result))
 			result = []token.Token {}
 		}else if k.IsOperand() {
 			result = append(result, k)
@@ -69,7 +66,7 @@ func precedence(t token.Token) uint{
 	return 0
 }
 
-func togroup(postfix []token.Token) *group.Group {
+func togroup(postfix []token.Token) group.Group {
 	var start_group *group.Group
 	var curr_group *group.Group
 
@@ -110,5 +107,5 @@ func togroup(postfix []token.Token) *group.Group {
 			panic("Found something other than operator or operand")
 		}
 	}
-	return start_group
+	return *start_group
 }
