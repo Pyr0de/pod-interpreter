@@ -1,4 +1,4 @@
-package main
+package scanner
 
 import (
 	"errors"
@@ -10,6 +10,7 @@ import (
 )
 
 func Tokenize(input string) ([]token.Token, error) {
+	input += "\n"
 	tokens := []token.Token {}
 	err := false
 
