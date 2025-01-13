@@ -2,11 +2,21 @@
 <html>
 	<head>
 		<script src="wasm_exec.js"></script>
-		<script>
-			const go = new Go();
-			WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
-				go.run(result.instance)
-			})
-		</script>
+		<script src="index.js" defer></script>
+		<link rel="stylesheet" href="style.css">
 	</head>
+	<body>
+		<select id="type">
+			<option id="tokenize">Tokenize</option>
+			<option id="parse">Parse</option>
+		</select>
+		<button id="run">Run</button>
+		<div id="main">
+			<textarea id="input"></textarea>
+			<div id="output_div">
+				<div id="output_tab" class="loading"></div>
+				<textarea id="output" disabled></textarea>
+			</div>
+		</div>
+	</body>
 </html>

@@ -18,7 +18,7 @@ func Interpreter(t string, f string)int {
 			}
 			fmt.Println("EOF  null")
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Tokenize Error")
+				fmt.Fprintln(os.Stderr, "Tokenize Error")
 				return 65
 			}
 			return 0
@@ -26,7 +26,7 @@ func Interpreter(t string, f string)int {
 		case "parse": {
 			t, err := scanner.Tokenize(string(f))
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Tokenize Error")
+				fmt.Fprintln(os.Stderr, "Tokenize Error")
 				return 65
 			}
 
@@ -36,7 +36,7 @@ func Interpreter(t string, f string)int {
 			}
 
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Parser Error")
+				fmt.Fprintln(os.Stderr, "Parser Error")
 				return 65
 			}
 			return 0
