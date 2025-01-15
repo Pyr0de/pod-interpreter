@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Pyr0de/pod-interpreter/cmd/eval"
 	"github.com/Pyr0de/pod-interpreter/cmd/parser"
 	"github.com/Pyr0de/pod-interpreter/cmd/scanner"
 )
@@ -38,6 +39,24 @@ func Interpreter(t string, f string)int {
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "Parser Error")
 				return 65
+			}
+			return 0
+		}
+		case "evaluate": {
+			t, err := scanner.Tokenize(string(f))
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "Tokenize Error")
+				return 65
+			}
+
+			exp, err := parser.Parse(t)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "Parser Error")
+				return 65
+			}
+			for _,v := range exp {
+				out := eval.Evaluate(&v)
+				fmt.Println(out, out.Raw)
 			}
 			return 0
 		}
