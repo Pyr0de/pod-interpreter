@@ -1,62 +1,65 @@
-html {
-   margin: 0px;
-   height: 100%;
-   width: 100%;
+:root {
+	--base: #1e1e2e;
+	--window: #313244;
+	--highlight: #a6adc8;
+	--text: #cdd6f4;
+	
+	--red: #f38ba8;
+	--green: #a6e3a1;
 }
-body {
-   margin: 0px;
-   min-height: 100%;
-   width: 100%;
-   flex-direction: column;
-}
-#main {
-	display: flex;
-	flex: 1;
-	width: 100%;
-	height: 95vh;
-	padding: 0;
+@font-face {
+	font-family: "MesloLGS";
+	src: url(MesloLGS-Regular.ttf);
 }
 
 #input {
-	flex: 1;
-	height: 100%;
-	width: 50%;
-	border: 1px solid #ccc;
-	resize: none;
-	margin: 0;
-	padding: 0;
+	border: none;
+	font-size: large;
+	border-radius: 10px;
+	padding: 5px;
 }
-
+#input:focus-within, #input:focus-visible, #input:focus {
+	outline: 1px solid var(--highlight);
+}
+::selection {
+	color: var(--base);
+	background-color: var(--highlight);
+}
 #output_div {
-	flex: 1;
-	height: 100%;
-	width: 50%;
-	border: 1px solid #ccc;
-	overflow: auto;
-	margin: 0;
-	padding: 0;
-	flex-direction: row;
-	display: block;
-}
-#output_tab {
-	height: 5%;
-	aspect-ratio: 1 / 1;
-	width: initial;
-	border-radius: 50%;
+	border: none;
+	border-radius: 10px;
 }
 #output {
-	height: 95%;
-	width: 100%;
-	border: none;
+	font-size: large;
 }
 
+select, #run {
+	border-radius: 5px;
+	border: none;
+	margin: 4px;
+}
+
+.base {
+	background-color: var(--base);
+}
+.text {
+	font-family: MesloLGS;
+	color: var(--text);
+}
+.window {
+	background-color: var(--window);
+}
 
 .success {
-	background-color: green;
+	background-color: var(--green);
 }
 .fail {
-	background-color: red;
+	background-color: var(--red);
 }
 .loading {
-	background-color: grey;
+	background-color: var(--text);
+}
+
+.err {
+	color: var(--red);
 }

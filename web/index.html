@@ -3,19 +3,23 @@
 	<head>
 		<script src="wasm_exec.js"></script>
 		<script src="index.js" defer></script>
+		<script src="wasm.js" defer></script>
 		<link rel="stylesheet" href="style.css">
+		<link rel="stylesheet" href="layout.css">
 	</head>
-	<body>
-		<select id="type">
-			<option id="tokenize">Tokenize</option>
-			<option id="parse">Parse</option>
-		</select>
-		<button id="run">Run</button>
-		<div id="main">
-			<textarea id="input"></textarea>
-			<div id="output_div">
+	<body class="base text">
+		<div id="topbar">
+			<select id="type" class="window text">
+				<option id="tokenize">Tokenize</option>
+				<option id="parse">Parse</option>
+			</select>
+			<button id="run" class="window text">Run</button>
+		</div>
+		<div id="main" class="text">
+			<textarea id="input" spellcheck="false" class="text window"></textarea>
+			<div id="output_div" class="window text">
 				<div id="output_tab" class="loading"></div>
-				<textarea id="output" disabled></textarea>
+				<div id="output" class="window"></div>
 			</div>
 		</div>
 	</body>

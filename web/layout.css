@@ -1,0 +1,51 @@
+html {
+   margin: 0px;
+   height: 100%;
+   width: 100%;
+}
+body {
+   margin: 0px;
+   min-height: 100%;
+   width: 100%;
+   flex-direction: column;
+}
+
+#main {
+	display: flex;
+	flex: 1;
+	width: 100%;
+	height: 95%;
+	padding: 0;
+	position: absolute;
+}
+
+#input {
+	flex: 1;
+	height: 100%;
+	width: 50%;
+	resize: none;
+	margin: 0.1%;
+	padding: 5px;
+
+	caret-color: #f5e0dc;
+}
+
+#output_div {
+	flex: 1;
+	height: 100%;
+	width: 50%;
+	overflow: auto;
+	margin: 0.1%;
+	padding: 5px;
+	flex-direction: row;
+	display: block;
+}
+#output_tab {
+	height: 5px;
+	border-radius: 10px 10px 0 0;
+}
+#output {
+	height: 95%;
+	width: 100%;
+	border: none;
+}
