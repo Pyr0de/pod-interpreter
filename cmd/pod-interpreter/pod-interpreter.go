@@ -54,9 +54,16 @@ func Interpreter(t string, f string)int {
 				fmt.Fprintln(os.Stderr, "Parser Error")
 				return 65
 			}
+			e := false
 			for _,v := range exp {
-				out := eval.Evaluate(&v)
-				fmt.Println(out, out.Raw)
+				out, err := eval.Evaluate(&v)
+				if err {
+					e = err
+				}
+				fmt.Println(out)
+			}
+			if e {
+				return 65
 			}
 			return 0
 		}

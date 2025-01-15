@@ -8,9 +8,13 @@ import (
 	"github.com/Pyr0de/pod-interpreter/cmd/token"
 )
 
-func Evaluate(in_group *group.Group) token.Token{
+func Evaluate(in_group *group.Group) (token.Token, bool){
 	if group1, ok := in_group.Operand1.(*group.Group); ok {
-		in_group.Operand1 = Evaluate(group1)
+		g, err :=  Evaluate(group1)
+		if err {
+			return token.Token{}, true
+		}
+		in_group.Operand1 = g
 	}else if _, ok := in_group.Operand1.(token.Token); !ok {
 		panic("Error evaluating operand 1")
 	}
@@ -18,7 +22,11 @@ func Evaluate(in_group *group.Group) token.Token{
 	if !in_group.Operator.IsUnary() && in_group.Operator.TokenType != token.None{
 
 		if group2, ok := in_group.Operand2.(*group.Group); ok {
-			in_group.Operand2 = Evaluate(group2)
+			g, err :=  Evaluate(group2)
+			if err {
+				return token.Token{}, true
+			}
+			in_group.Operand2 = g
 		}else if _, ok := in_group.Operand2.(token.Token); !ok {
 			panic("Error evaluating operand 2")
 		}
@@ -26,14 +34,18 @@ func Evaluate(in_group *group.Group) token.Token{
 	
 	t1, ok1 := in_group.Operand1.(token.Token)
 	if in_group.Operator.TokenType == token.None {
-		return t1
+		return t1, false
 	}
 
 	t2, ok2 := in_group.Operand2.(token.Token)
 	if !ok1 || (!ok2 && in_group.Operand2 != nil) {
 		panic(fmt.Sprintf("operands should be tokens: operand1=%s, operand2=%s", in_group.Operand1, in_group.Operand2))
 	}
-	return eval_token(in_group.Operator, t1, t2)
+	t := eval_token(in_group.Operator, t1, t2)
+	if t.TokenType == token.None {
+		return t, true
+	}
+	return t, false
 }
 
 func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token) token.Token {
