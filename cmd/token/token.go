@@ -90,6 +90,10 @@ func (t Token)IsUnary() bool {
 	return t.TokenType == BANG || t.TokenType == NEG 
 }
 
+func (t Token)IsBool() bool {
+	return t.TokenType == TRUE || t.TokenType == FALSE
+}
+
 func (t TokenType)String() string{
 	switch t {
 	case None:
