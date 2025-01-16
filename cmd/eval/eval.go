@@ -82,7 +82,7 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 			}
 		}
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}
@@ -100,7 +100,7 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 		case token.NUMBER:
 			operand1.Value = operand1.Value.(float64) < operand2.Value.(float64)
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}
@@ -115,7 +115,7 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 		case token.NUMBER:
 			operand1.Value = operand1.Value.(float64) <= operand2.Value.(float64)
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}
@@ -130,7 +130,7 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 		case token.NUMBER:
 			operand1.Value = operand1.Value.(float64) > operand2.Value.(float64)
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}
@@ -145,7 +145,7 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 		case token.NUMBER:
 			operand1.Value = operand1.Value.(float64) >= operand2.Value.(float64)
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}
@@ -160,7 +160,7 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 		case token.TRUE, token.FALSE:
 			operand1.Value = operand1.Value.(bool) && operand2.Value.(bool)
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}
@@ -175,7 +175,7 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 		case token.TRUE, token.FALSE:
 			operand1.Value = operand1.Value.(bool) || operand2.Value.(bool)
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}
@@ -194,7 +194,7 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 			operand1.Value = operand1.Value.(string) + operand2.Value.(string)
 			res_type = token.STRING
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}
@@ -205,7 +205,7 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 			operand1.Value = operand1.Value.(float64) - operand2.Value.(float64)
 			res_type = token.NUMBER
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}
@@ -216,7 +216,7 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 			operand1.Value = -1 * operand1.Value.(float64)
 			res_type = token.NUMBER
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}
@@ -227,7 +227,7 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 			operand1.Value = operand1.Value.(float64) * operand2.Value.(float64)
 			res_type = token.NUMBER
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}
@@ -236,13 +236,13 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 		switch operand1.TokenType {
 		case token.NUMBER:
 			if operand2.Value.(float64) == 0.0 {
-				fmt.Fprintln(os.Stderr, "Error: Cannot divide by zero\n")
+				fmt.Fprintf(os.Stderr, "Error: Cannot divide by zero\n")
 				return token.Token{}
 			}
 			operand1.Value = operand1.Value.(float64) / operand2.Value.(float64)
 			res_type = token.NUMBER
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}
@@ -254,7 +254,7 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 			//operand1.Value = operand1.Value.(float64) % operand2.Value.(float64)
 			//res_type = token.NUMBER
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}
@@ -265,13 +265,13 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 			panic("not implemented")
 			//v, ok := int(operand2.Value.(float64))
 			//if !ok {
-			//	//fmt.Fprintln(os.Stderr, "Error: Cannot divide by zero\n")
+			//	//fmt.Fprintf(os.Stderr, "Error: Cannot divide by zero\n")
 			//	return token.Token{}
 			//}
 			//operand1.Value = operand1.Value.(float64)  operand2.Value.(float64)
 			//res_type = token.NUMBER
 		default:
-			fmt.Fprintln(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
 				operator.Raw, operand1.TokenType)
 			return token.Token{}
 		}

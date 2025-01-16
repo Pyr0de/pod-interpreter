@@ -176,6 +176,8 @@ func reserved(identifier string) token.TokenType {
 		return token.FUNC
 	case "return":
 		return token.RETURN
+	case "print":
+		return token.PRINT
 	}
 	return token.IDENTIFIER
 }

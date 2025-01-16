@@ -53,6 +53,7 @@ const (
 	INIT
 	FUNC
 	RETURN
+	PRINT
 
 	NEWLINE
 	WHITESPACE
@@ -168,6 +169,8 @@ func (t TokenType)String() string{
 		return "FUNC"
 	case RETURN:
 		return "RETURN"
+	case PRINT:
+		return "PRINT"
 	}
 	return ""
 }
