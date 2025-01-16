@@ -12,11 +12,15 @@
 			<select id="type" class="window text">
 				<option id="tokenize">Tokenize</option>
 				<option id="parse">Parse</option>
+				<option id="parse">Evaluate</option>
 			</select>
 			<button id="run" class="window text">Run</button>
 		</div>
 		<div id="main" class="text">
-			<textarea id="input" spellcheck="false" class="text window"></textarea>
+			<div id="input_div">
+				<textarea id="input" spellcheck="false" class="text window"></textarea>
+				<div id="input_overlay"></div>
+			</div>
 			<div id="output_div" class="window text">
 				<div id="output_tab" class="loading"></div>
 				<div id="output" class="window"></div>

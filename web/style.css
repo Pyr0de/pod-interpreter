@@ -17,6 +17,8 @@
 	font-size: large;
 	border-radius: 10px;
 	padding: 5px;
+
+	caret-color: #f5e0dc;
 }
 #input:focus-within, #input:focus-visible, #input:focus {
 	outline: 1px solid var(--highlight);

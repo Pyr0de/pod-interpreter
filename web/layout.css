@@ -19,15 +19,26 @@ body {
 	position: absolute;
 }
 
-#input {
+#input_div {
 	flex: 1;
 	height: 100%;
 	width: 50%;
-	resize: none;
-	margin: 0.1%;
-	padding: 5px;
+	margin: 0.4%;
+	margin-top: 0.1%;
+	padding: 0;
+}
 
-	caret-color: #f5e0dc;
+#input {
+	height: 100%;
+	width: 100%;
+	resize: none;
+	padding: 5px;
+	margin: 0;
+}
+
+#input_overlay {
+	color: black;
+	position: absolute;
 }
 
 #output_div {
@@ -35,7 +46,8 @@ body {
 	height: 100%;
 	width: 50%;
 	overflow: auto;
-	margin: 0.1%;
+	margin: 0.4%;
+	margin-top: 0.1%;
 	padding: 5px;
 	flex-direction: row;
 	display: block;
