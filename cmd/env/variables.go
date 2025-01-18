@@ -3,7 +3,7 @@ package env
 import "github.com/Pyr0de/pod-interpreter/cmd/token"
 
 
-var store map[string]token.Token;
+var store map[string]token.Token = make(map[string]token.Token)
 
 func InitVar(variable string, val token.Token) {
 	store[variable] = val
