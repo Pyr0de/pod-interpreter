@@ -34,11 +34,29 @@ func Evaluate(in_group group.Group) (token.Token, bool){
 	}
 	
 	t1, ok1 := in_group.Operand1.(token.Token)
+	if t1.TokenType == token.IDENTIFIER {
+		op, err := env.GetVar(t1.Raw)
+		if err {
+			fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized variable \"%s\"\n",
+				t1.Line, t1.Raw)
+			return token.Token{}, true
+		}
+		t1 = op
+	}
 	if in_group.Operator.TokenType == token.None {
 		return t1, false
 	}
 
 	t2, ok2 := in_group.Operand2.(token.Token)
+	if t2.TokenType == token.IDENTIFIER {
+		op, err := env.GetVar(t2.Raw)
+		if err {
+			fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized variable \"%s\"\n",
+				t2.Line, t2.Raw)
+			return token.Token{}, true
+		}
+		t2 = op
+	}
 	if !ok1 || (!ok2 && in_group.Operand2 != nil) {
 		panic(fmt.Sprintf("operands should be tokens: operand1=%s, operand2=%s", in_group.Operand1, in_group.Operand2))
 	}
@@ -50,24 +68,6 @@ func Evaluate(in_group group.Group) (token.Token, bool){
 }
 
 func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token) token.Token {
-	if operand1.TokenType == token.IDENTIFIER {
-		op, err := env.GetVar(operand1.Raw)
-		if err {
-			fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized variable \"%s\"\n",
-			operand1.Line, operand1.Raw)
-			return token.Token{}
-		}
-		operand1 = op
-	}
-	if operand2.TokenType == token.IDENTIFIER {
-		op, err := env.GetVar(operand2.Value.(string))
-		if err {
-			fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized variable \"%s\"",
-			operand2.Line, operand2.Value)
-			return token.Token{}
-		}
-		operand2 = op
-	}
 
 	if (operand1.TokenType != operand2.TokenType) && (!operand1.IsBool() || !operand2.IsBool()) &&
 		operand2.TokenType != token.None {

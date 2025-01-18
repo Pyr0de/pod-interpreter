@@ -60,7 +60,6 @@ func Interpreter(t string, f string)int {
 				if err {
 					e = err
 				}
-				fmt.Println(v)
 				fmt.Println(out)
 			}
 			if e {
@@ -82,7 +81,7 @@ func Interpreter(t string, f string)int {
 			for _, v := range s {
 				e := v.Statement.Run()
 				if e {
-					fmt.Fprintf(os.Stderr, "[line %d] Erro")
+					fmt.Fprintf(os.Stderr, "Error\n")
 					return 66
 				}
 			}
