@@ -56,10 +56,11 @@ func Interpreter(t string, f string)int {
 			}
 			e := false
 			for _,v := range exp {
-				out, err := eval.Evaluate(&v)
+				out, err := eval.Evaluate(v)
 				if err {
 					e = err
 				}
+				fmt.Println(v)
 				fmt.Println(out)
 			}
 			if e {

@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-	fmt.Println("Building Native")
 	e := 1
 	if len(os.Args) > 2 {
 		f, err := os.ReadFile(os.Args[2])

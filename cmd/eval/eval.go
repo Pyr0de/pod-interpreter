@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Pyr0de/pod-interpreter/cmd/env"
 	"github.com/Pyr0de/pod-interpreter/cmd/group"
 	"github.com/Pyr0de/pod-interpreter/cmd/token"
 )
 
-func Evaluate(in_group *group.Group) (token.Token, bool){
+func Evaluate(in_group group.Group) (token.Token, bool){
 	if group1, ok := in_group.Operand1.(*group.Group); ok {
-		g, err :=  Evaluate(group1)
+		g, err :=  Evaluate(*group1)
 		if err {
 			return token.Token{}, true
 		}
@@ -22,7 +23,7 @@ func Evaluate(in_group *group.Group) (token.Token, bool){
 	if !in_group.Operator.IsUnary() && in_group.Operator.TokenType != token.None{
 
 		if group2, ok := in_group.Operand2.(*group.Group); ok {
-			g, err :=  Evaluate(group2)
+			g, err :=  Evaluate(*group2)
 			if err {
 				return token.Token{}, true
 			}
@@ -49,6 +50,25 @@ func Evaluate(in_group *group.Group) (token.Token, bool){
 }
 
 func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token) token.Token {
+	if operand1.TokenType == token.IDENTIFIER {
+		op, err := env.GetVar(operand1.Raw)
+		if err {
+			fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized variable \"%s\"\n",
+			operand1.Line, operand1.Raw)
+			return token.Token{}
+		}
+		operand1 = op
+	}
+	if operand2.TokenType == token.IDENTIFIER {
+		op, err := env.GetVar(operand2.Value.(string))
+		if err {
+			fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized variable \"%s\"",
+			operand2.Line, operand2.Value)
+			return token.Token{}
+		}
+		operand2 = op
+	}
+
 	if (operand1.TokenType != operand2.TokenType) && (!operand1.IsBool() || !operand2.IsBool()) &&
 		operand2.TokenType != token.None {
 		fmt.Fprintf(os.Stderr, "Cannot operate on %s and %s\n", operand1.TokenType, operand2.TokenType)
@@ -60,6 +80,7 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 	if operand2.IsBool() && operand2.Value == nil {
 		operand2.Value = operand2.TokenType == token.TRUE
 	}
+
 	res_type := token.None
 
 	switch operator.TokenType {

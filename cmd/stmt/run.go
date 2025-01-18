@@ -7,7 +7,7 @@ import (
 )
 
 func (s StmtPrint)Run() bool {
-	v, err := eval.Evaluate(&s.Expression)
+	v, err := eval.Evaluate(s.Expression)
 	if err {
 		return true
 	}
