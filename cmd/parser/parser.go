@@ -10,7 +10,8 @@ import (
 
 func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 	code := []stmt.Stmt{}
-	for i, k := range tokens {
+	for i := 0; i < len(tokens); i++ {
+		k := tokens[i]
 		switch k.TokenType {
 		case token.PRINT:
 			j := i+1
@@ -28,6 +29,7 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			code = append(code, stmt.Stmt{
 				Stype: token.PRINT, Statement: stmt.StmtPrint{Expression: exp[0]},
 			})
+			i = j;
 		case token.INIT: {
 			j := i+1
 			for ;j < len(tokens);j++ {
@@ -44,8 +46,14 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Malformed init", tokens[j].Line)
 				return code, true
 			}
-			
+			code = append(code, stmt.Stmt{
+				Stype: token.INIT, Statement: stmt.StmtInit{Expression: exp[0]},
+			})
+			i = j;
 		}
+		default:
+			fmt.Fprintf(os.Stderr, "[line %d] Error: Unknown token found \"%s\"\n", tokens[i].Line, tokens[i].Raw)
+			break
 		}
 		
 	}
