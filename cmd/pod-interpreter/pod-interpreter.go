@@ -31,7 +31,7 @@ func Interpreter(t string, f string)int {
 				return 65
 			}
 
-			exp, err := parser.Parse(t)
+			exp, err := parser.ParseExpression(t)
 			for _, v := range exp {
 				fmt.Println(v)
 			}
@@ -49,7 +49,7 @@ func Interpreter(t string, f string)int {
 				return 65
 			}
 
-			exp, err := parser.Parse(t)
+			exp, err := parser.ParseExpression(t)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "Parser Error")
 				return 65
@@ -63,10 +63,29 @@ func Interpreter(t string, f string)int {
 				fmt.Println(out)
 			}
 			if e {
-				return 65
+				return 66
 			}
 			return 0
 		}
+		case "run":
+			t, err := scanner.Tokenize(string(f))
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "Tokenize Error")
+				return 65
+			}
+			s, e := parser.Parse(t)
+			if e {
+				fmt.Fprintln(os.Stderr, "Parser Error")
+				return 65
+			}
+			for _, v := range s {
+				e := v.Statement.Run()
+				if e {
+					fmt.Fprintf(os.Stderr, "[line %d] Erro")
+					return 66
+				}
+			}
+			return 0
 		default:
 			return 1
 	}
