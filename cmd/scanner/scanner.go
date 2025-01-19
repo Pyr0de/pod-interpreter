@@ -162,7 +162,7 @@ func reserved(identifier string) token.TokenType {
 		return token.TRUE
 	case "false":
 		return token.FALSE
-	case "init":
+	case "let":
 		return token.INIT
 	case "if":
 		return token.IF
