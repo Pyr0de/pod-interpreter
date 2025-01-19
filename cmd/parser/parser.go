@@ -62,17 +62,19 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 				}
 			}
 			exp, err := ParseExpression(tokens[i:j])
-			if err != nil || exp[0].Operator.TokenType != token.EQUAL{
+			if err != nil {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Unexpected token found \"%s\"\n", tokens[i].Line, tokens[i].Raw)
 				return code, true
 			}
-			code = append(code, stmt.Stmt{
-				Stype: token.INIT, Statement: stmt.StmtAssign{Expression: exp[0], Init: false},
-			})
+			if exp[0].Operator.TokenType == token.EQUAL {
+				code = append(code, stmt.Stmt{
+					Stype: token.INIT, Statement: stmt.StmtAssign{Expression: exp[0], Init: false},
+				})
+			}
 			i = j;
 		}
-		
+
 	}
-	
+
 	return code, false
 }
