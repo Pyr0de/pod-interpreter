@@ -68,7 +68,9 @@ type Token struct {
 }
 
 func (t Token)String() string {
-	if t.Value != nil {
+	if t.TokenType == None {
+		return t.TokenType.String()
+	}else if t.Value != nil {
 		return fmt.Sprint(t.Value)
 	}else {
 		return t.Raw
