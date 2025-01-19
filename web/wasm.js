@@ -59,6 +59,6 @@ run_button.addEventListener("click", () => {
 	output.innerHTML = "";
 	WebAssembly.instantiate(wasm, go.importObject).then((result) => {
 		go.run(result.instance)
-		go.exit(run(document.getElementById("type").value.toLowerCase(), input.value))
+		go.exit(run(document.getElementById("type").value, input.value))
 	})
 })
