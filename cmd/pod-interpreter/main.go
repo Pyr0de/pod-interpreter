@@ -16,7 +16,7 @@ func main() {
 		}
 		e = Interpreter(os.Args[1],string(f))
 	}
-	if e != 0 {
+	if e == 1{
 		fmt.Println("Usage:", os.Args[0], "{tokenize/parse} {filename}")
 	}
 	os.Exit(e)
