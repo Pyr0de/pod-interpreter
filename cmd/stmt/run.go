@@ -2,6 +2,7 @@ package stmt
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/Pyr0de/pod-interpreter/cmd/env"
 	"github.com/Pyr0de/pod-interpreter/cmd/eval"
@@ -14,38 +15,46 @@ func (s StmtPrint)Run() bool {
 	if err {
 		return true
 	}
-	fmt.Println(v)
+	fmt.Println(v.String())
 	return false
 }
 
-func (s StmtInit)Run() bool {
-	val, ok := s.Expression.Operand2.(token.Token)
+func (s StmtAssign)Run() bool {
+	g, ok := s.Expression.Operand2.(*group.Group)
 	if !ok {
-		v, ok := s.Expression.Operand2.(*group.Group)
+		t, ok := s.Expression.Operand2.(token.Token)
 		if !ok {
 			panic("InitRun: val is not token/group")
 		}
-		v_token, err := eval.Evaluate(*v)
-		if err {
-			return true
-		}
-		val = v_token
+		g = &group.Group{Operand1: t}
 	}
 
-	initVar(s.Expression.Operand1, val)
+	val, err := eval.Evaluate(*g)
+	if err {
+		return true
+	}
+
+	initVar(s.Expression.Operand1, val, s.Init)
 
 	return false
 }
 
-func initVar(in_group any, val token.Token) {
+func initVar(in_group any, val token.Token, init bool) {
 	if t, ok := in_group.(token.Token); ok {
-		env.InitVar(t.Raw, val)
+		if init {
+			env.InitVar(t.Raw, val)
+		}else {
+			err := env.SetVar(t.Raw, val)
+			if err {
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized variable \"%s\"\n", t.Line, t.Raw)
+			}
+		}
 	}else {
 		g, ok := in_group.(*group.Group)
 		if !ok {
 			panic("in_group is not token/group")
 		}
-		initVar(g.Operand1, val)
-		initVar(g.Operand2, val)
+		initVar(g.Operand1, val, init)
+		initVar(g.Operand2, val, init)
 	}
 }

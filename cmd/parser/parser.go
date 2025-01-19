@@ -42,18 +42,34 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected an expression", tokens[j].Line)
 				return code, true
 			}
-			if exp[0].Operator.TokenType != token.EQUAL {
+			if exp[0].Operator.TokenType != token.EQUAL && exp[0].Operator.TokenType != token.None{
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Malformed init", tokens[j].Line)
 				return code, true
 			}
+			if exp[0].Operand2 == nil {
+				exp[0].Operand2 = token.Token{}
+			}
 			code = append(code, stmt.Stmt{
-				Stype: token.INIT, Statement: stmt.StmtInit{Expression: exp[0]},
+				Stype: token.INIT, Statement: stmt.StmtAssign{Expression: exp[0], Init: true},
 			})
 			i = j;
 		}
 		default:
-			fmt.Fprintf(os.Stderr, "[line %d] Error: Unknown token found \"%s\"\n", tokens[i].Line, tokens[i].Raw)
-			break
+			j := i+1
+			for ;j < len(tokens);j++ {
+				if tokens[j].TokenType == token.SEMICOLON {
+					break
+				}
+			}
+			exp, err := ParseExpression(tokens[i:j])
+			if err != nil || exp[0].Operator.TokenType != token.EQUAL{
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Unexpected token found \"%s\"\n", tokens[i].Line, tokens[i].Raw)
+				return code, true
+			}
+			code = append(code, stmt.Stmt{
+				Stype: token.INIT, Statement: stmt.StmtAssign{Expression: exp[0], Init: false},
+			})
+			i = j;
 		}
 		
 	}

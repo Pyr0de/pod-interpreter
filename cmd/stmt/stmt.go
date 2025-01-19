@@ -18,12 +18,9 @@ type StmtPrint struct {
 	Expression group.Group
 }
 
-type StmtInit struct {
+type StmtAssign struct {
 	Expression group.Group
-}
-
-type StmtExpr struct {
-	Expression group.Group
+	Init bool
 }
 
 type StmtIf struct {
