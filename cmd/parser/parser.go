@@ -9,6 +9,7 @@ import (
 )
 
 func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
+	brace_count := 0
 	code := []stmt.Stmt{}
 	for i := 0; i < len(tokens); i++ {
 		k := tokens[i]
@@ -54,6 +55,21 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			})
 			i = j;
 		}
+		case token.L_BRACE:
+			brace_count++
+			code = append(code, stmt.Stmt{
+				Stype: token.L_BRACE, Statement: stmt.StmtScope{Open: true},
+			})
+		case token.R_BRACE:
+			code = append(code, stmt.Stmt{
+				Stype: token.R_BRACE, Statement: stmt.StmtScope{Open: false},
+			})
+
+			brace_count--
+			if brace_count < 0 {
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Unexpected brace found \"%s\"\n", tokens[i].Line, tokens[i].Raw)
+				return code, true
+			}
 		default:
 			j := i+1
 			for ;j < len(tokens);j++ {
@@ -74,6 +90,11 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			i = j;
 		}
 
+	}
+	
+	if brace_count > 0 {
+		fmt.Fprintf(os.Stderr, "[line %d] Error: Expected brace \"}\"\n",)
+		return code, true
 	}
 
 	return code, false

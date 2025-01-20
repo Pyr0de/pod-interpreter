@@ -58,3 +58,13 @@ func initVar(in_group any, val token.Token, init bool) {
 		initVar(g.Operand2, val, init)
 	}
 }
+
+func (s StmtScope)Run() bool {
+	if s.Open {
+		env.NextScope()
+	}else {
+		env.PrevScope()
+	}
+
+	return false
+}

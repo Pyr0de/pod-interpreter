@@ -5,6 +5,11 @@ import "github.com/Pyr0de/pod-interpreter/cmd/token"
 
 var env *environment = &environment{store: make(map[string]token.Token), global: nil}
 
+type environment struct {
+	store map[string]token.Token
+	global *environment
+}
+
 func InitVar(variable string, val token.Token) {
 	env.store[variable] = val
 }
@@ -34,21 +39,25 @@ func GetVar(variable string) (token.Token, bool) {
 	return token.Token{}, true
 }
 
-type environment struct {
-	store map[string]token.Token
-	global *environment
-}
-
 func findVar(variable string) *environment {
 	curr := env
-
 	for curr != nil {
-		
 		if _, ok := curr.store[variable]; ok {
 			return curr
 		}
-
 		curr = curr.global
 	}
 	return nil
+}
+
+func NextScope() {
+	env = &environment{store: make(map[string]token.Token), global: env}
+}
+
+func PrevScope() {
+	if env.global != nil {
+		env = env.global
+	}else {
+		panic("env.global is nil")
+	}
 }

@@ -23,6 +23,10 @@ type StmtAssign struct {
 	Init bool
 }
 
+type StmtScope struct {
+	Open bool
+}
+
 type StmtIf struct {
 	Expression group.Group
 	Block []Stmt
