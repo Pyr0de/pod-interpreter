@@ -17,6 +17,7 @@
 	font-size: large;
 	border-radius: 10px;
 	padding: 5px;
+	tab-size: 4;
 
 	caret-color: #f5e0dc;
 }
