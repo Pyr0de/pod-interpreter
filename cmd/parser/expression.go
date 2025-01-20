@@ -125,7 +125,7 @@ func togroup(postfix []token.Token) (group.Group, bool) {
 			}
 			groups.back()
 		}else {
-			panic("Found something other than operator or operand")
+			panic(fmt.Sprintln("Found something other than operator or operand:", postfix[i]))
 		}
 	}
 	if !groups.valid() {
