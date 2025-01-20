@@ -1,4 +1,4 @@
-.PHONY: build run
+.PHONY: build build-wasm exec run run-wasm
 
 build:
 	@go build -o ./bin/pod-interpreter ./cmd/pod-interpreter/
@@ -10,12 +10,12 @@ build-wasm:
 	@cp ./web/* ./bin/web/
 	@rm ./bin/web/*.go
 	@echo "Wasm Build"
-	@go build -o ./bin/pod-interpreter ./web/main.go
-	@echo "Build Server"
 
 exec:
 	@echo "Running..."
 	./bin/pod-interpreter $(ARGS)
 
 run: build exec
-run-wasm: build-wasm exec
+run-wasm: build-wasm
+	@go build -o ./bin/pod-interpreter ./web/main.go
+	@$(MAKE) exec
