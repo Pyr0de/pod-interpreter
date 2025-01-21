@@ -42,6 +42,8 @@ func Evaluate(in_group group.Group) (token.Token, bool){
 			return token.Token{}, true
 		}
 		t1 = op
+	}else if t1.IsBool() {
+		t1.Value = t1.TokenType == token.TRUE
 	}
 	if in_group.Operator.TokenType == token.None {
 		return t1, false
@@ -56,6 +58,8 @@ func Evaluate(in_group group.Group) (token.Token, bool){
 			return token.Token{}, true
 		}
 		t2 = op
+	}else if t2.IsBool() {
+		t2.Value = t2.TokenType == token.TRUE
 	}
 	if !ok1 || (!ok2 && in_group.Operand2 != nil) {
 		panic(fmt.Sprintf("operands should be tokens: operand1=%s, operand2=%s", in_group.Operand1, in_group.Operand2))
@@ -73,12 +77,6 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 		operand2.TokenType != token.None {
 		fmt.Fprintf(os.Stderr, "Cannot operate on %s and %s\n", operand1.TokenType, operand2.TokenType)
 		return token.Token{}
-	}
-	if operand1.IsBool() && operand1.Value == nil {
-		operand1.Value = operand1.TokenType == token.TRUE
-	}
-	if operand2.IsBool() && operand2.Value == nil {
-		operand2.Value = operand2.TokenType == token.TRUE
 	}
 
 	res_type := token.None
