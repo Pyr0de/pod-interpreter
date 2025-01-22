@@ -59,12 +59,36 @@ func initVar(in_group any, val token.Token, init bool) {
 	}
 }
 
-func (s StmtScope)Run() bool {
-	if s.Open {
-		env.NextScope()
-	}else {
-		env.PrevScope()
+func (s StmtBlock)Run() bool {
+	env.NextScope()
+	for _, v := range s.Block {
+		e := v.Statement.Run()
+		if e {
+			fmt.Fprintf(os.Stderr, "Error\n")
+			return true
+		}
 	}
+	env.PrevScope()
+	return false
+}
 
+func (s StmtIf)Run() bool {
+	v, err := eval.Evaluate(s.Expression)
+	b, ok := v.Value.(bool)
+	if err || !v.IsBool() || !ok {
+		fmt.Fprintf(os.Stderr, "[line %d] Error: Expected boolean expression\n", )
+		return true
+	}
+	if b {
+		return s.Block.Run()
+	}else {
+		if s.Else != nil {
+			return s.Else.Run()
+		}
+	}
+	return false
+}
+
+func (_ StmtEmpty)Run() bool {
 	return false
 }

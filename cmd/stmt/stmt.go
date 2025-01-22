@@ -23,13 +23,14 @@ type StmtAssign struct {
 	Init bool
 }
 
-type StmtScope struct {
-	Open bool
+type StmtBlock struct {
+	Block []Stmt
 }
 
 type StmtIf struct {
 	Expression group.Group
-	Block []Stmt
+	Block StmtBlock
 	Else *StmtIf
 }
 
+type StmtEmpty struct {}
