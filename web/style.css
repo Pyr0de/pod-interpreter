@@ -31,9 +31,11 @@
 #output_div {
 	border: none;
 	border-radius: 10px;
+	overflow: hidden;
 }
 #output {
 	font-size: large;
+	overflow: auto;
 }
 
 select, #run {
