@@ -89,6 +89,26 @@ func (s StmtIf)Run() bool {
 	return false
 }
 
+func (s StmtWhile)Run() bool {
+	for {
+		v, err := eval.Evaluate(s.Expression)
+		b, ok := v.Value.(bool)
+		if err || !v.IsBool() || !ok {
+			fmt.Fprintf(os.Stderr, "[line %d] Error: Expected boolean expression\n", )
+			return true
+		}
+		if !b {
+			break
+		}
+		e := s.Block.Run()
+		if e {
+			return err
+		}
+	}
+
+	return false
+}
+
 func (_ StmtEmpty)Run() bool {
 	return false
 }

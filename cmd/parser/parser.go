@@ -134,23 +134,73 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 				for curr.Else != nil {
 					curr = curr.Else
 				}
+				isElse := false
 				if if_stmt, ok := s[0].Statement.(stmt.StmtIf); ok {
 					curr.Else = &if_stmt
 				}else if else_stmt, ok := s[0].Statement.(stmt.StmtBlock); ok {
 					exp := group.Group{Operand1: token.Token{TokenType: token.TRUE}}
 					curr.Else = &stmt.StmtIf{Expression: exp, Block: else_stmt}
+					isElse = true
 				}else {
 					fmt.Fprintln(os.Stderr, "found something other than if/else: ", s[0])
 					return code, true
 				}
 				code[len(code)-1].Statement = iffy
-				
+				if isElse {
+					code = append(code, stmt.Stmt{Stype: token.None, Statement: stmt.StmtEmpty{}})
+				}
 				i = j
 			}else {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected \"if\" before \"else\"\n",
+					tokens[i].Line)
+				return code, true
+			}
+		case token.WHILE:
+			j := i+1
+			for ;j < len(tokens);j++ {
+				if tokens[j].TokenType == token.L_BRACE {
+					break
+				}
+			}
+			
+			if tokens[j].TokenType != token.L_BRACE {
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected expression, found \"%s\"",
+					tokens[j].Line, tokens[j].Raw)
+				return code, true
+			}
+			exp, err := ParseExpression(tokens[i+1:j])
+			if err != nil || len(exp) != 1 {
+				
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected expression\n", tokens[j].Line)
+				return code, true
+			}
+			i = j
+			j++
+			count := 1
+			for ;j < len(tokens);j++ {
+				if tokens[j].TokenType == token.R_BRACE {
+					count--
+					if count <= 0 {
+						break
+					}
+				}
+				if tokens[j].TokenType == token.L_BRACE {
+					count++
+				}
+			}
+			if tokens[j].TokenType != token.R_BRACE || count > 0 {
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected token \"}\"\n",
 					tokens[i].Line, tokens[i].Raw)
 				return code, true
 			}
+			s, e := Parse(tokens[i+1:j])
+			if e {
+				return code, true
+			}
+			code = append(code, stmt.Stmt{
+				Stype: token.WHILE, Statement: stmt.StmtWhile{Expression: exp[0], Block: stmt.StmtBlock{Block: s}},
+			})
+			i = j
 		case token.L_BRACE:
 			count := 1
 			j := i+1

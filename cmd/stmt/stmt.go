@@ -33,4 +33,9 @@ type StmtIf struct {
 	Else *StmtIf
 }
 
+type StmtWhile struct {
+	Expression group.Group
+	Block StmtBlock
+}
+
 type StmtEmpty struct {}
