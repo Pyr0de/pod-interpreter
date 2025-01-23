@@ -6,9 +6,6 @@ let wasm;
 })();
 
 function stdout(string) {
-	if (tab.classList.contains("success") || tab.classList.contains("fail")) {
-		tab.className = "loading"
-	}
 	if (string.trim() != "") {
 		output.innerHTML += string.trim() + "<br>"
 	}
@@ -57,8 +54,13 @@ run_button.addEventListener("click", () => {
 	}
 	output.innerText = "";
 	output.innerHTML = "";
+	tab.className = "loading"
 	WebAssembly.instantiate(wasm, go.importObject).then((result) => {
 		go.run(result.instance)
+		let start = new Date().getTime()
 		go.exit(run(document.getElementById("type").value, input.value))
+		let end = new Date().getTime()
+		stdout("Program exited...");
+		stdout(`Time: ${end - start} ms`)
 	})
 })
