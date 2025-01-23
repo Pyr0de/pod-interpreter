@@ -43,6 +43,7 @@ make run-wasm
 - [X] Variable
 - [X] Print
 - [X] If statement
+- [ ] While loop
 - [ ] For loop
 - [ ] Functions
 - [ ] Return
