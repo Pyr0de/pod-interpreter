@@ -31,6 +31,8 @@ func ParseExpression(tokens []token.Token) ([]group.Group, error) {
 				}else if !a.Empty(){
 					exp = append(exp, a)
 				}
+			}else {
+				exp = append(exp, group.Group{})
 			}
 			result = []token.Token {}
 		}else if k.IsOperand() {
