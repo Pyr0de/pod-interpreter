@@ -1,5 +1,5 @@
 # Pod Interpreter
-Pod is a dynamically typed language, similar to Python and Javascript
+Written in Go!
 ### Example:
 ```
 let a = 10;
@@ -25,12 +25,18 @@ make build
 make build-wasm
 ```
 
-## Execute
+## Usage
 Native Executable can be found in `./bin`
 ```sh
-make run
+./bin/podinterpreter {arguments} {.pod file}`
 ```
-Web interpreter can be found in `./bin/wasm`
+Arguments
+- `tokenize`
+- `parse` (parse expression)
+- `evaluate` (evaluate expression)
+- `run` (run program)
+
+Web server starts at localhost:8080. Web interpreter files can be found in `./bin/wasm`
 ```sh
 # Wasm (server at localhost:8080)
 make run-wasm
