@@ -1,0 +1,8 @@
+let count = 0;
+let str = "*";
+
+while count < 10 {
+	print str;
+	str = str + "*";
+	count = count + 1;
+}
