@@ -245,6 +245,10 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 				code = append(code, stmt.Stmt{
 					Stype: token.INIT, Statement: stmt.StmtAssign{Expression: exp[0], Init: false},
 				})
+			}else {
+				code = append(code, stmt.Stmt{
+					Stype: token.INIT, Statement: stmt.StmtExpression{Expression: exp[0]},
+				})
 			}
 			i = j;
 		}

@@ -59,6 +59,12 @@ func initVar(in_group any, val token.Token, init bool) {
 	}
 }
 
+func (s StmtExpression)Run() bool {
+	val, err := eval.Evaluate(s.Expression)
+	fmt.Printf("[line %d] >> %s\n", val.Line, val.String())
+	return err
+}
+
 func (s StmtBlock)Run() bool {
 	env.NextScope()
 	for _, v := range s.Block {

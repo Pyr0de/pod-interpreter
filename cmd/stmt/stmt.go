@@ -23,6 +23,10 @@ type StmtAssign struct {
 	Init bool
 }
 
+type StmtExpression struct {
+	Expression group.Group
+}
+
 type StmtBlock struct {
 	Block []Stmt
 }
