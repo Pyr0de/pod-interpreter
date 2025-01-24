@@ -42,4 +42,11 @@ type StmtWhile struct {
 	Block StmtBlock
 }
 
+type StmtFor struct {
+	Initialization Stmt
+	Condition group.Group
+	Step Stmt
+	Block StmtBlock
+}
+
 type StmtEmpty struct {}

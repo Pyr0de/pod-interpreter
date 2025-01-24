@@ -115,6 +115,45 @@ func (s StmtWhile)Run() bool {
 	return false
 }
 
+func (s StmtFor)Run() bool {
+	
+	e := false
+	if assign, ok := s.Initialization.Statement.(StmtAssign); ok {
+		e = assign.Run()
+	}
+	if e {
+		return e
+	}
+	condition := s.Condition
+	if condition.Empty() {
+		condition = group.Group{Operand1: token.Token{TokenType: token.TRUE, Value: true}}
+	}
+	step, step_ok := s.Step.Statement.(StmtAssign)
+
+	for {
+		v, err := eval.Evaluate(condition)
+		b, ok := v.Value.(bool)
+		if err || !v.IsBool() || !ok {
+			fmt.Fprintf(os.Stderr, "[line %d] Error: Expected boolean expression\n", )
+			return true
+		}
+		if !b {
+			break
+		}
+		e := s.Block.Run()
+		if e {
+			return err
+		}
+		if step_ok {
+			e = step.Run()
+		}
+		if e {
+			return err
+		}
+	}
+	return false
+}
+
 func (_ StmtEmpty)Run() bool {
 	return false
 }

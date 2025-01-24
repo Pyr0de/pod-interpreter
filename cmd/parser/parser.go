@@ -170,7 +170,6 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			}
 			exp, err := ParseExpression(tokens[i+1:j])
 			if err != nil || len(exp) != 1 {
-				
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected expression\n", tokens[j].Line)
 				return code, true
 			}
@@ -201,6 +200,65 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 				Stype: token.WHILE, Statement: stmt.StmtWhile{Expression: exp[0], Block: stmt.StmtBlock{Block: s}},
 			})
 			i = j
+		case token.FOR:
+			j := i+1
+			for ;j < len(tokens);j++ {
+				if tokens[j].TokenType == token.L_BRACE {
+					break
+				}
+			}
+			
+			if tokens[j].TokenType != token.L_BRACE {
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected expression, found \"%s\"",
+					tokens[j].Line, tokens[j].Raw)
+				return code, true
+			}
+			statements, err := Parse(tokens[i+1:j])
+			if len(statements) == 2 {
+				statements = append(statements, stmt.Stmt{Stype: token.SEMICOLON, Statement: stmt.StmtExpression{}})
+			}
+			if err || len(statements) != 3 {
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected 3 expressions\n", tokens[j].Line)
+				return code, true
+			}
+			condition, ok := statements[1].Statement.(stmt.StmtExpression)
+			if !ok {
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected 3 expressions\n", tokens[j].Line)
+				return code, true
+			}
+			i = j
+			j++
+
+			count := 1
+			for ;j < len(tokens);j++ {
+				if tokens[j].TokenType == token.R_BRACE {
+					count--
+					if count <= 0 {
+						break
+					}
+				}
+				if tokens[j].TokenType == token.L_BRACE {
+					count++
+				}
+			}
+			if tokens[j].TokenType != token.R_BRACE || count > 0 {
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected token \"}\"\n",
+					tokens[i].Line, tokens[i].Raw)
+				return code, true
+			}
+			s, e := Parse(tokens[i+1:j])
+			if e {
+				return code, true
+			}
+			code = append(code, stmt.Stmt{
+				Stype: token.FOR, Statement: stmt.StmtFor{
+					Initialization: statements[0],
+					Condition: condition.Expression,
+					Block: stmt.StmtBlock{Block: s},
+					Step: statements[2],
+				},
+			})
+			i = j
 		case token.L_BRACE:
 			count := 1
 			j := i+1
@@ -229,14 +287,17 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			})
 			i = j
 		default:
-			j := i+1
+			j := i
 			for ;j < len(tokens);j++ {
 				if tokens[j].TokenType == token.SEMICOLON {
 					break
 				}
 			}
 			exp, err := ParseExpression(tokens[i:j])
-			if err != nil {
+			if j < len(tokens) {
+				exp, err = ParseExpression(tokens[i:j+1])
+			}
+			if err != nil || len(exp) <= 0{
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Unexpected token found \"%s\"\n",
 					tokens[i].Line, tokens[i].Raw)
 				return code, true
@@ -247,7 +308,7 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 				})
 			}else {
 				code = append(code, stmt.Stmt{
-					Stype: token.INIT, Statement: stmt.StmtExpression{Expression: exp[0]},
+					Stype: tokens[i].TokenType, Statement: stmt.StmtExpression{Expression: exp[0]},
 				})
 			}
 			i = j;

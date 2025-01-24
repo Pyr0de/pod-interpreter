@@ -44,7 +44,7 @@ make run-wasm
 - [X] Print
 - [X] If statement
 - [X] While loop
-- [ ] For loop
+- [X] For loop
 - [ ] Functions
 - [ ] Return
 - [ ] File read/write
