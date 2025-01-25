@@ -259,6 +259,77 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 				},
 			})
 			i = j
+		case token.FUNC:
+			i++
+			if tokens[i].TokenType != token.IDENTIFIER {
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected identifier after \"func\"\n",
+				tokens[i].Line)
+				return code, true
+			}
+			func_name := tokens[i]
+			i++
+			if tokens[i].TokenType != token.L_BRACKET {
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected L_BRACKET(\"(\") after \"IDENTIFIER\"\n",
+				tokens[i].Line)
+				return code, true
+			}
+			parameters := []token.Token{}
+			i++
+			for i < len(tokens) && tokens[i].TokenType != token.R_BRACKET {
+				if tokens[i].TokenType == token.IDENTIFIER {
+					if tokens[i+1].TokenType == token.COMMA && tokens[i+2].TokenType == token.IDENTIFIER{
+						parameters = append(parameters, tokens[i])
+						i += 2
+					}else if tokens[i+1].TokenType == token.R_BRACKET{
+						parameters = append(parameters, tokens[i])
+						i += 1
+						break
+					}else {
+						fmt.Fprintf(os.Stderr, "[line %d] Error: Malformed function declaration\n",
+						tokens[i].Line)
+						return code, true
+						//error malformed function declaration
+					}
+				}else {
+					fmt.Fprintf(os.Stderr, "[line %d] Error: Expected parameters, found \"%s\"\n",
+					tokens[i].Line, tokens[i].Raw)
+					return code, true
+				}
+			}
+			if tokens[i].TokenType != token.R_BRACKET || tokens[i+1].TokenType != token.L_BRACE{
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Malformed function declaration\n",
+				tokens[i].Line)
+				return code, true
+				// error malformed function declaration
+			}
+			i += 1
+			j := i+1
+			count := 1
+			for ;j < len(tokens);j++ {
+				if tokens[j].TokenType == token.R_BRACE {
+					count--
+					if count <= 0 {
+						break
+					}
+				}
+				if tokens[j].TokenType == token.L_BRACE {
+					count++
+				}
+			}
+			if tokens[j].TokenType != token.R_BRACE || count > 0 {
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected token \"}\"\n",
+					tokens[i].Line, tokens[i].Raw)
+				return code, true
+			}
+			s, e := Parse(tokens[i+1:j])
+			if e {
+				return code, true
+			}
+			fmt.Println(func_name, parameters, s)
+			//code = append(code, stmt.Stmt{
+			//	Stype: token.WHILE, Statement: stmt.StmtWhile{Expression: exp[0], Block: stmt.StmtBlock{Block: s}},
+			//})
+			i = j
 		case token.L_BRACE:
 			count := 1
 			j := i+1
