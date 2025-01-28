@@ -1,4 +1,4 @@
-.PHONY: build build-wasm exec run run-wasm
+.PHONY: build build-wasm exec run run-wasm cp-examples
 
 build:
 	@go build -o ./bin/pod-interpreter ./cmd/pod-interpreter/
@@ -15,7 +15,14 @@ exec:
 	@echo "Running..."
 	./bin/pod-interpreter $(ARGS)
 
+cp-examples:
+	@echo "Copying Examples..."
+	@python3 ./examples/example-index.py
+	@cp -r ./examples ./bin/web
+	@rm ./bin/web/examples/*.py
+	@mv ./bin/example_index.json ./bin/web/examples
+
 run: build exec
-run-wasm: build-wasm
+run-wasm: build-wasm cp-examples
 	@go build -o ./bin/pod-interpreter ./web/main.go
 	@$(MAKE) exec
