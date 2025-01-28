@@ -6,8 +6,9 @@ let wasm;
 })();
 
 function stdout(string) {
-	if (string.trim() != "") {
-		output.innerHTML += string.trim() + "<br>"
+	string = string.replace("\n", "<br>")
+	if (string != "") {
+		output.innerHTML += string + "<br>"
 	}
 }
 
@@ -15,9 +16,9 @@ function stderr(string) {
 	if (tab.classList.contains("success") || tab.classList.contains("fail")) {
 		tab.className = "loading"
 	}
-	if (string.trim() != "") {
+	if (string != "") {
 		let span = document.createElement("span")
-		span.innerText = string.trim() + "\n"
+		span.innerText = string + "\n"
 		span.className = "err"
 		output.appendChild(span)
 	}
@@ -41,7 +42,7 @@ globalThis.fs.writeSync = (fd, buf) => {
 	const nl = outputBuf.lastIndexOf("\n");
 	if (nl != -2) {
 		let out = fd == 2 ? stderr : stdout
-		out(outputBuf.substring(0, nl))
+		out(outputBuf.substring(0, nl).trim())
 		outputBuf = outputBuf.substring(nl);
 	}
 	return buf.length;
@@ -60,7 +61,7 @@ run_button.addEventListener("click", () => {
 		let start = new Date().getTime()
 		go.exit(run(document.getElementById("type").value, input.value))
 		let end = new Date().getTime()
-		stdout("Program exited...");
+		stdout("\nProgram exited...");
 		stdout(`Time: ${end - start} ms`)
 	})
 })

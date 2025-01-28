@@ -1,10 +1,14 @@
-.PHONY: build build-wasm exec run run-wasm cp-examples
+.PHONY: build build-wasm exec run run-wasm cp-examples clean
 
-build:
+clean:
+	@rm -rf ./bin/*
+	@mkdir -p bin
+
+build: clean
 	@go build -o ./bin/pod-interpreter ./cmd/pod-interpreter/
 	@echo "Native Build"
 
-build-wasm:
+build-wasm: clean
 	@GOOS=js GOARCH=wasm go build -o ./bin/web/main.wasm ./cmd/pod-interpreter
 	@cp "$(shell go env GOROOT)/misc/wasm/wasm_exec.js" ./bin/web/
 	@cp ./web/* ./bin/web/
