@@ -22,7 +22,7 @@ type environment struct {
 
 func InitVar(env *environment, variable string, val token.Token) bool {
 	if findVar(env, variable) == nil{
-		env.store[variable] = val
+		curr_env.store[variable] = val
 		return false
 	}
 	fmt.Fprintf(os.Stderr, "Error: Variable \"%s\" already exists cannot reinitialize\n", variable)
