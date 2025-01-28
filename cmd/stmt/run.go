@@ -42,9 +42,9 @@ func (s StmtAssign)Run() bool {
 func initVar(in_group any, val token.Token, init bool) {
 	if t, ok := in_group.(token.Token); ok {
 		if init {
-			env.InitVar(t.Raw, val)
+			env.InitVar(nil, t.Raw, val)
 		}else {
-			err := env.SetVar(t.Raw, val)
+			err := env.SetVar(nil, t.Raw, val)
 			if err {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized variable \"%s\"\n", t.Line, t.Raw)
 			}
@@ -66,7 +66,7 @@ func (s StmtExpression)Run() bool {
 }
 
 func (s StmtBlock)Run() bool {
-	env.NextScope()
+	env.NextScope(nil)
 	for _, v := range s.Block {
 		e := v.Statement.Run()
 		if e {
@@ -74,7 +74,7 @@ func (s StmtBlock)Run() bool {
 			return true
 		}
 	}
-	env.PrevScope()
+	env.PrevScope(nil)
 	return false
 }
 
@@ -116,7 +116,6 @@ func (s StmtWhile)Run() bool {
 }
 
 func (s StmtFor)Run() bool {
-	
 	e := false
 	if assign, ok := s.Initialization.Statement.(StmtAssign); ok {
 		e = assign.Run()
