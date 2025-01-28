@@ -153,6 +153,15 @@ func (s StmtFor)Run() bool {
 	return false
 }
 
+func (s StmtFunc)Run() bool {
+	fmt.Println(s)
+	return env.InitFunc(nil, s.Name.Raw, token.Token{
+		TokenType: token.FUNC, Value: &s, Line: s.Name.Line,
+	})
+
+}
+
+
 func (_ StmtEmpty)Run() bool {
 	return false
 }

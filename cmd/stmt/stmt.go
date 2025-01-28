@@ -49,4 +49,15 @@ type StmtFor struct {
 	Block StmtBlock
 }
 
+type StmtFunc struct {
+	Name token.Token
+	Parameters []token.Token
+	Block StmtBlock
+}
+
+type StmtFuncCall struct {
+	Name token.Token
+	Parameters []token.Token
+}
+
 type StmtEmpty struct {}

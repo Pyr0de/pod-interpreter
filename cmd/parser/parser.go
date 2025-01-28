@@ -288,7 +288,6 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 						fmt.Fprintf(os.Stderr, "[line %d] Error: Malformed function declaration\n",
 						tokens[i].Line)
 						return code, true
-						//error malformed function declaration
 					}
 				}else {
 					fmt.Fprintf(os.Stderr, "[line %d] Error: Expected parameters, found \"%s\"\n",
@@ -300,7 +299,6 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Malformed function declaration\n",
 				tokens[i].Line)
 				return code, true
-				// error malformed function declaration
 			}
 			i += 1
 			j := i+1
@@ -325,10 +323,9 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			if e {
 				return code, true
 			}
-			fmt.Println(func_name, parameters, s)
-			//code = append(code, stmt.Stmt{
-			//	Stype: token.WHILE, Statement: stmt.StmtWhile{Expression: exp[0], Block: stmt.StmtBlock{Block: s}},
-			//})
+			code = append(code, stmt.Stmt{
+				Stype: token.FUNC, Statement: stmt.StmtFunc{Name: func_name, Parameters: parameters, Block: stmt.StmtBlock{Block: s}},
+			})
 			i = j
 		case token.L_BRACE:
 			count := 1
