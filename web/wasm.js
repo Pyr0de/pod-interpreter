@@ -26,6 +26,9 @@ function stderr(string) {
 
 // program exit
 go.exit = (code) => {
+	if (code == undefined) {
+		return
+	}
 	if (code == 0) {
 		tab.className = "success"
 	}else {
