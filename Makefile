@@ -14,6 +14,7 @@ build-wasm: clean
 	@cp ./web/* ./bin/web/
 	@rm ./bin/web/*.go
 	@echo "Wasm Build"
+	@$(MAKE) cp-examples
 
 exec:
 	@echo "Running..."
@@ -27,6 +28,6 @@ cp-examples:
 	@mv ./bin/example_index.json ./bin/web/examples
 
 run: build exec
-run-wasm: build-wasm cp-examples
+run-wasm: build-wasm
 	@go build -o ./bin/pod-interpreter ./web/main.go
 	@$(MAKE) exec
