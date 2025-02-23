@@ -42,9 +42,9 @@ func (s StmtAssign)Run() bool {
 func initVar(in_group any, val token.Token, init bool) {
 	if t, ok := in_group.(token.Token); ok {
 		if init {
-			env.InitVar(nil, t.Raw, val)
+			env.InitVar(t.Raw, val)
 		}else {
-			err := env.SetVar(nil, t.Raw, val)
+			err := env.SetVar(t.Raw, val)
 			if err {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized variable \"%s\"\n", t.Line, t.Raw)
 			}
@@ -66,7 +66,7 @@ func (s StmtExpression)Run() bool {
 }
 
 func (s StmtBlock)Run() bool {
-	env.NextScope(nil)
+	env.NextScope()
 	for _, v := range s.Block {
 		e := v.Statement.Run()
 		if e {
@@ -74,7 +74,7 @@ func (s StmtBlock)Run() bool {
 			return true
 		}
 	}
-	env.PrevScope(nil)
+	env.PrevScope()
 	return false
 }
 
@@ -82,7 +82,7 @@ func (s StmtIf)Run() bool {
 	v, err := eval.Evaluate(s.Expression)
 	b, ok := v.Value.(bool)
 	if err || !v.IsBool() || !ok {
-		fmt.Fprintf(os.Stderr, "[line %d] Error: Expected boolean expression\n")
+		fmt.Fprintf(os.Stderr, "[line %d] Error: Expected boolean expression\n", v.Line)
 		return true
 	}
 	if b {
@@ -100,7 +100,7 @@ func (s StmtWhile)Run() bool {
 		v, err := eval.Evaluate(s.Expression)
 		b, ok := v.Value.(bool)
 		if err || !v.IsBool() || !ok {
-			fmt.Fprintf(os.Stderr, "[line %d] Error: Expected boolean expression\n", )
+			fmt.Fprintf(os.Stderr, "[line %d] Error: Expected boolean expression\n", v.Line)
 			return true
 		}
 		if !b {
@@ -133,7 +133,7 @@ func (s StmtFor)Run() bool {
 		v, err := eval.Evaluate(condition)
 		b, ok := v.Value.(bool)
 		if err || !v.IsBool() || !ok {
-			fmt.Fprintf(os.Stderr, "[line %d] Error: Expected boolean expression\n", )
+			fmt.Fprintf(os.Stderr, "[line %d] Error: Expected boolean expression\n", v.Line)
 			return true
 		}
 		if !b {
@@ -154,26 +154,28 @@ func (s StmtFor)Run() bool {
 }
 
 func (s StmtFunc)Run() bool {
-	return env.InitFunc(nil, s.Name.Raw, token.Token{
+	return env.InitFunc(s.Name.Raw, token.Token{
 		TokenType: token.FUNC, Value: &s, Line: s.Name.Line,
 	})
 
 }
 
 func (s StmtFuncCall)Run() bool {
-	e := env.FindFunc(nil, s.Name.Raw)
+	e := env.FindFunc(s.Name.Raw)
 	if e == nil {
 		// function not found
 		fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized function \"%s\"\n", s.Name.Line, s.Name.Raw)
 		return true
 	}
+
+	prev_env := env.SwapEnv(env.NewEnv())
 	if f, ok := e.Functions[s.Name.Raw].Value.(*StmtFunc); ok {
 		f.Block.Run()
 	}else {
 		panic("Found something other than stmtfunc")
 	}
 	
-
+	env.SwapEnv(prev_env)
 	return false
 }
 

@@ -35,7 +35,7 @@ func Evaluate(in_group group.Group) (token.Token, bool){
 	
 	t1, ok1 := in_group.Operand1.(token.Token)
 	if t1.TokenType == token.IDENTIFIER {
-		op, err := env.GetVar(nil, t1.Raw)
+		op, err := env.GetVar(t1.Raw)
 		if err {
 			fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized variable \"%s\"\n",
 				t1.Line, t1.Raw)
@@ -51,7 +51,7 @@ func Evaluate(in_group group.Group) (token.Token, bool){
 
 	t2, ok2 := in_group.Operand2.(token.Token)
 	if t2.TokenType == token.IDENTIFIER {
-		op, err := env.GetVar(nil, t2.Raw)
+		op, err := env.GetVar(t2.Raw)
 		if err {
 			fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized variable \"%s\"\n",
 				t2.Line, t2.Raw)

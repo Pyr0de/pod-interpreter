@@ -7,21 +7,17 @@ import (
 	"github.com/Pyr0de/pod-interpreter/cmd/token"
 )
 
-var curr_env *environment = &environment{
-	store: make(map[string]token.Token),
-	functions: make(map[string]token.Token),
-	global: nil,
-}
+var curr_env *Environment = NewEnv()
 
-type environment struct {
+type Environment struct {
 	store map[string]token.Token
-	functions map[string]token.Token
-	global *environment
+	Functions map[string]token.Token
+	global *Environment
 }
 
 
-func InitVar(env *environment, variable string, val token.Token) bool {
-	if findVar(env, variable) == nil{
+func InitVar(variable string, val token.Token) bool {
+	if findVar(variable) == nil{
 		curr_env.store[variable] = val
 		return false
 	}
@@ -29,8 +25,8 @@ func InitVar(env *environment, variable string, val token.Token) bool {
 	return true
 }
 
-func SetVar(env *environment, variable string, val token.Token) bool {
-	e := findVar(env, variable)
+func SetVar(variable string, val token.Token) bool {
+	e := findVar(variable)
 	if e != nil {
 		e.store[variable] = val
 		return false
@@ -38,15 +34,15 @@ func SetVar(env *environment, variable string, val token.Token) bool {
 	return true
 }
 
-func DestructVar(env *environment, variable string) {
-	e := findVar(env, variable)
+func DestructVar(variable string) {
+	e := findVar(variable)
 	if e != nil {
 		delete(e.store, variable)
 	}
 }
 
-func GetVar(env *environment, variable string) (token.Token, bool) {
-	e := findVar(env, variable)
+func GetVar(variable string) (token.Token, bool) {
+	e := findVar(variable)
 	if e != nil {
 		t, _ := e.store[variable]
 		return t, false
@@ -54,11 +50,8 @@ func GetVar(env *environment, variable string) (token.Token, bool) {
 	return token.Token{}, true
 }
 
-func findVar(env *environment, variable string) *environment {
-	if env == nil {
-		env = curr_env
-	}
-	curr := env
+func findVar(variable string) *Environment {
+	curr := curr_env
 	for curr != nil {
 		if _, ok := curr.store[variable]; ok {
 			return curr
@@ -68,20 +61,26 @@ func findVar(env *environment, variable string) *environment {
 	return nil
 }
 
-func NextScope(env *environment) *environment {
-	if env == nil {
-		env = curr_env
-	}
-	return &environment{
-		store: make(map[string]token.Token),
-		functions: make(map[string]token.Token),
-		global: env,
-	}
+func NextScope() {
+	c := NewEnv()
+	c.global = curr_env
+	curr_env = c
 }
 
-func PrevScope(env *environment) *environment {
-	if env == nil {
-		env = curr_env
+func PrevScope() {
+	curr_env = curr_env.global
+}
+
+func SwapEnv(swap *Environment) *Environment {
+	e := curr_env
+	curr_env = swap
+	return e
+}
+
+func NewEnv() *Environment {
+	return &Environment{
+		store: make(map[string]token.Token),
+		Functions: make(map[string]token.Token),
+		global: nil,
 	}
-	return env.global
 }
