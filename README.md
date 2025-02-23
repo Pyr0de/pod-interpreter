@@ -28,7 +28,7 @@ make build-wasm
 ## Usage
 Native Executable can be found in `./bin`
 ```sh
-./bin/podinterpreter {arguments} {.pod file}`
+./bin/podinterpreter {arguments} {.pod file}
 ```
 Arguments
 - `tokenize`
@@ -51,7 +51,8 @@ make run-wasm
 - [X] If statement
 - [X] While loop
 - [X] For loop
-- [ ] Functions
+- [X] Functions
+- [ ] Function Arguments
 - [ ] Return
 - [ ] File read/write
 - [ ] Stdin
