@@ -14,6 +14,57 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 	code := []stmt.Stmt{}
 	for i := 0; i < len(tokens); i++ {
 		k := tokens[i]
+		
+		// Parse function calling
+		if i+1 < len(tokens) &&
+		tokens[i].TokenType == token.IDENTIFIER &&
+		tokens[i+1].TokenType == token.L_BRACKET {
+			j := i+2
+			args := []stmt.Stmt{}
+			start := j
+			for ; j < len(tokens); j++ {
+				if tokens[j].TokenType == token.R_BRACKET {
+					if j > start {
+						arg, err := Parse(tokens[start:j])
+						if err || len(arg) != 1{
+							//print error
+							fmt.Fprintln(os.Stderr, "Parser Error")
+							return code, true
+						}
+						args = append(args, arg[0])
+					}
+					break
+				}
+				if tokens[j].TokenType == token.COMMA {
+					if len(tokens) <= j+1 || tokens[j+1].TokenType == token.R_BRACKET {
+						//error: Found ) after ,
+						return code, true
+					}
+					if start >= j {
+						//error nothing found between ,
+						return code, true
+					}
+					// parse expression from tokens[start:j]
+					arg, err := Parse(tokens[start:j])
+					if err || len(arg) != 1{
+						//print error
+						fmt.Fprintln(os.Stderr, "Parser Error")
+						return code, true
+					}
+					args = append(args, arg[0])
+					start = j+1
+				}
+			}
+			i = j
+			code = append(code, stmt.Stmt{Stype: k.TokenType, Statement: stmt.StmtFuncCall{
+				Name: k,
+				Parameters: args,
+			}})
+			if i+1 < len(tokens) && tokens[i+1].TokenType == token.SEMICOLON {
+				i++
+			}
+			continue
+		}
 		switch k.TokenType {
 		case token.PRINT:
 			j := i+1

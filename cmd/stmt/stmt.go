@@ -57,7 +57,7 @@ type StmtFunc struct {
 
 type StmtFuncCall struct {
 	Name token.Token
-	Parameters []token.Token
+	Parameters []Stmt
 }
 
 type StmtEmpty struct {}

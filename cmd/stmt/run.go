@@ -82,7 +82,7 @@ func (s StmtIf)Run() bool {
 	v, err := eval.Evaluate(s.Expression)
 	b, ok := v.Value.(bool)
 	if err || !v.IsBool() || !ok {
-		fmt.Fprintf(os.Stderr, "[line %d] Error: Expected boolean expression\n", )
+		fmt.Fprintf(os.Stderr, "[line %d] Error: Expected boolean expression\n")
 		return true
 	}
 	if b {
@@ -154,13 +154,28 @@ func (s StmtFor)Run() bool {
 }
 
 func (s StmtFunc)Run() bool {
-	fmt.Println(s)
 	return env.InitFunc(nil, s.Name.Raw, token.Token{
 		TokenType: token.FUNC, Value: &s, Line: s.Name.Line,
 	})
 
 }
 
+func (s StmtFuncCall)Run() bool {
+	e := env.FindFunc(nil, s.Name.Raw)
+	if e == nil {
+		// function not found
+		fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized function \"%s\"\n", s.Name.Line, s.Name.Raw)
+		return true
+	}
+	if f, ok := e.Functions[s.Name.Raw].Value.(*StmtFunc); ok {
+		f.Block.Run()
+	}else {
+		panic("Found something other than stmtfunc")
+	}
+	
+
+	return false
+}
 
 func (_ StmtEmpty)Run() bool {
 	return false
