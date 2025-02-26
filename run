@@ -64,10 +64,10 @@ if [[ $WASM ]]; then
 	python3 ./examples/example-index.py
 	rm ./$OUT_DIR/examples/*.py
 
-	OUT_PATH="./$OUT_DIR/main.wasm"
+	OUT_PATH="$OUT_DIR/main.wasm"
 	echo "[ Building for WASM ]"
 else
-	OUT_PATH="./$OUT_DIR/$OUT_NAME"
+	OUT_PATH="$OUT_DIR/$OUT_NAME"
 	echo "[ Building for native ]"
 fi
 build

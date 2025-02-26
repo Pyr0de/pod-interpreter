@@ -16,30 +16,40 @@ if a == 10 {
 
 ## Prerequsites
 - go (>=1.22.2)
+- python3
+- bash
+
 ## Build
 ```sh
-make build
+./run build
 ```
 ```sh
 # Wasm
-make build-wasm
+./run build wasm
 ```
 
 ## Usage
-Native Executable can be found in `./bin`
+Native Executable can be found in `./out`
 ```sh
-./bin/podinterpreter {arguments} {.pod file}
+RUN_TYPE={interpreter-arg} ./run {script-args} {.pod file} 
+# OR
+./out/pod-interpreter {interpreter-arg} {.pod file}
 ```
-Arguments
+Interpreter Arguments
 - `tokenize`
 - `parse` (parse expression)
 - `evaluate` (evaluate expression)
 - `run` (run program)
 
-Web server starts at localhost:8080. Web interpreter files can be found in `./bin/wasm`
+Script Arguments (not set by default)
+- `build`: builds for selected target
+- `wasm`: sets target to WASM
+- `test`: Runs tests 
+
+Web server starts at localhost:8080. Web interpreter files can be found in `./out`
 ```sh
 # Wasm (server at localhost:8080)
-make run-wasm
+./run wasm
 ```
 
 ## To-Do
