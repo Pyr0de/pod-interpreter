@@ -1,0 +1,74 @@
+#!/bin/bash
+
+OUT_DIR="out"
+OUT_NAME="pod-interpreter"
+OUT_PATH="$OUT_DIR/$OUT_NAME"
+
+exit_usage() {
+	echo "Usage: $0 {argument} {file}"
+	exit 1
+}
+
+clean_output() {
+	mkdir -p $OUT_DIR
+	# checks that out_dir is set properly (or atleast i try)
+	if [[ ! "$OUT_DIR/.." -ef $(pwd) ]]; then
+		echo "invalid out_dir"
+		exit 1
+	fi
+	rm --preserve-root -rf $OUT_DIR
+	mkdir -p $OUT_DIR
+}
+
+build() {
+	go build -o $OUT_PATH ./cmd/pod-interpreter
+}
+
+if [[ ! $RUN_TYPE ]]; then
+	RUN_TYPE=run
+fi
+
+FILE=${@: -1}
+
+for arg in "$@"; do
+    if [[ $arg == "build" ]]; then
+		BUILD=true
+	elif [[ $arg == "wasm" ]]; then
+		WASM=true
+	elif [[ $arg == "test" ]]; then
+		TEST=true
+	fi
+done
+
+if [[ $# -lt 1 ]]; then
+	exit_usage
+fi
+
+clean_output
+if [[ $TEST ]]; then
+	OUT_PATH="$OUT_DIR/$OUT_NAME"
+	build
+	# run tests
+	clean_output
+fi
+
+if [[ $WASM ]]; then
+	GOOS=js
+	GOARCH=wasm
+	cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" ./$OUT_DIR
+	cp ./web/* ./$OUT_DIR/
+	rm ./$OUT_DIR/*.go
+	OUT_PATH="./$OUT_DIR/main.wasm"
+else
+	OUT_PATH="./$OUT_DIR/$OUT_NAME"
+fi
+build
+
+if [[ ! $BUILD ]] && [[ $WASM ]]; then
+	go run web/main.go
+elif [[ ! $BUILD ]] && [[ -f $FILE ]]; then
+	./$OUT_PATH $RUN_TYPE $FILE
+elif [[ ! $BUILD ]] && [[ ! $TEST ]]; then
+	echo "Invalid file"
+	exit_usage
+fi
