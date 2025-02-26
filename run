@@ -48,6 +48,7 @@ clean_output
 if [[ $TEST ]]; then
 	OUT_PATH="$OUT_DIR/$OUT_NAME"
 	build
+	echo "[ Running Tests ]"
 	# run tests
 	clean_output
 fi
@@ -58,15 +59,28 @@ if [[ $WASM ]]; then
 	cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" ./$OUT_DIR
 	cp ./web/* ./$OUT_DIR/
 	rm ./$OUT_DIR/*.go
+
+	cp -r ./examples ./$OUT_DIR
+	python3 ./examples/example-index.py
+	rm ./$OUT_DIR/examples/*.py
+
 	OUT_PATH="./$OUT_DIR/main.wasm"
+	echo "[ Building for WASM ]"
 else
 	OUT_PATH="./$OUT_DIR/$OUT_NAME"
+	echo "[ Building for native ]"
 fi
 build
 
 if [[ ! $BUILD ]] && [[ $WASM ]]; then
 	go run web/main.go
 elif [[ ! $BUILD ]] && [[ -f $FILE ]]; then
+	OUT_MSG="[ Running on $FILE ]"
+	echo $OUT_MSG
+	for i in $(seq ${#OUT_MSG}); do
+		echo -n "-"
+	done
+	echo
 	./$OUT_PATH $RUN_TYPE $FILE
 elif [[ ! $BUILD ]] && [[ ! $TEST ]]; then
 	echo "Invalid file"
