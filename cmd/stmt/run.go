@@ -170,12 +170,36 @@ func (s StmtFuncCall)Run() bool {
 		return true
 	}
 
-	prev_env := env.SwapEnv(env.NewEnv())
-	if f, ok := e.Functions[s.Name.Raw].Value.(*StmtFunc); ok {
-		f.Block.Run()
-	}else {
+
+	f, ok := e.Functions[s.Name.Raw].Value.(*StmtFunc)
+	if !ok {
 		panic("Found something other than stmtfunc")
 	}
+	if len(f.Parameters) != len(s.Parameters) {
+		fmt.Printf(
+			`[line %d] Error: Mismatched number of parameters
+			expected %d parameters, found %d parameters\n`,
+			s.Name.Line, len(f.Parameters), len(s.Parameters),
+		)
+		return true
+	}
+	args_vals := []token.Token{}
+	for i := 0; i < len(s.Parameters); i++ {
+		val, err := eval.Evaluate(s.Parameters[i])
+		if err {
+			return true
+		}
+		args_vals = append(args_vals, val)
+	}
+
+	prev_env := env.SwapEnv(env.NewEnv())
+	env.InitFunc(s.Name.Raw, e.Functions[s.Name.Raw])
+
+	for i := 0; i < len(s.Parameters); i++ {
+		initVar(f.Parameters[i], args_vals[i], true)
+	}
+
+	f.Block.Run()
 	
 	env.SwapEnv(prev_env)
 	return false

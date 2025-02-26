@@ -20,13 +20,13 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 		tokens[i].TokenType == token.IDENTIFIER &&
 		tokens[i+1].TokenType == token.L_BRACKET {
 			j := i+2
-			args := []stmt.Stmt{}
+			args := []group.Group{}
 			start := j
 			for ; j < len(tokens); j++ {
 				if tokens[j].TokenType == token.R_BRACKET {
 					if j > start {
-						arg, err := Parse(tokens[start:j])
-						if err || len(arg) != 1{
+						arg, err := ParseExpression(tokens[start:j])
+						if err != nil || len(arg) != 1{
 							//print error
 							fmt.Fprintln(os.Stderr, "Parser Error")
 							return code, true
@@ -45,8 +45,8 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 						return code, true
 					}
 					// parse expression from tokens[start:j]
-					arg, err := Parse(tokens[start:j])
-					if err || len(arg) != 1{
+					arg, err := ParseExpression(tokens[start:j])
+					if err != nil || len(arg) != 1{
 						//print error
 						fmt.Fprintln(os.Stderr, "Parser Error")
 						return code, true

@@ -52,7 +52,7 @@ make run-wasm
 - [X] While loop
 - [X] For loop
 - [X] Functions
-- [ ] Function Arguments
+- [X] Function Arguments
 - [ ] Return
 - [ ] File read/write
 - [ ] Stdin
