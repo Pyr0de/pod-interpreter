@@ -24,7 +24,7 @@ func (s StmtAssign)Run() bool {
 	if !ok {
 		t, ok := s.Expression.Operand2.(token.Token)
 		if !ok {
-			panic("InitRun: val is not token/group")
+			panic(fmt.Sprintln("Expected operand2 to be group/token, found: ", s.Expression.Operand2))
 		}
 		g = &group.Group{Operand1: t}
 	}
@@ -39,6 +39,8 @@ func (s StmtAssign)Run() bool {
 	return false
 }
 
+// in_group is all the '=' together in a group
+// example: a = b = c = d = 10;
 func initVar(in_group any, val token.Token, init bool) {
 	if t, ok := in_group.(token.Token); ok {
 		if init {
