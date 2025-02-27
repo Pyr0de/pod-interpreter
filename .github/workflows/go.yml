@@ -34,7 +34,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: "linux_x64"
-        path: out/pod-interpreter
+        path: out/build/pod-interpreter
         
   pages:
     needs: test
@@ -54,7 +54,7 @@ jobs:
     - name: Upload Github Pages
       uses: actions/upload-pages-artifact@v3
       with:
-          path: out/
+          path: out/build
 
   deploy:
     if: startsWith(github.ref, 'refs/tags/')

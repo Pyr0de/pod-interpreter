@@ -1,8 +1,28 @@
 #!/bin/bash
 
+RED=';31'
+GREEN=';32'
+BLUE=';34'
+NORMAL='0'
+BOLD='1'
+
+color() {
+	if [[ $# -ge 1 ]];then
+		echo "\033[$1$2m"
+	else
+		echo '\033[0m'
+	fi
+}
+
 OUT_DIR="out"
+OUT_BUILD="$OUT_DIR/build"
 OUT_NAME="pod-interpreter"
-OUT_PATH="$OUT_DIR/$OUT_NAME"
+OUT_BUILD_PATH="$OUT_BUILD/$OUT_NAME"
+
+TEST_DIR="$OUT_DIR/test-tmp"
+P_STDERR="$TEST_DIR/stderr"
+P_STDOUT="$TEST_DIR/stdout"
+
 
 exit_usage() {
 	echo "Usage: $0 {argument} {file}"
@@ -21,11 +41,83 @@ clean_output() {
 }
 
 build() {
-	go build -o $OUT_PATH ./cmd/pod-interpreter
+	go build -o $OUT_BUILD_PATH ./cmd/pod-interpreter
+}
+
+run-tests() {
+	echo "[ Running Tests ]"
+
+	mkdir -p $TEST_DIR
+	touch $P_STDERR
+	touch $P_STDOUT
+
+	COUNT=0
+	PASS=0
+	FAIL=0
+
+	for i in $(find . -iregex "\.\/tests\/.*\.\(pod\|pd\)"); do
+		if [[ $i =~ (\.\/tests\/([^\/]+)[^.]+) ]]; then
+			run_type=${BASH_REMATCH[2]}
+			test_path=${BASH_REMATCH[1]}
+
+			./$OUT_BUILD_PATH $run_type $i >$P_STDOUT 2>$P_STDERR
+			exit_code=$?
+
+			exitcode_msg="ExitCode: $exit_code\n"
+			echo -ne "$exitcode_msg$(<$P_STDOUT)" >$P_STDOUT
+			echo -ne "$exitcode_msg$(<$P_STDERR)" >$P_STDERR
+			
+			expect_stdout_file="$test_path.stdout"
+			expect_stderr_file="$test_path.stderr"
+
+			diff_out=$(diff $P_STDOUT $expect_stdout_file 2>/dev/null)
+			diff_out_fail=$?
+			
+			diff_err=$(diff $P_STDERR $expect_stderr_file 2>/dev/null)
+			diff_err_fail=$?
+
+			if [[ $diff_err_fail -eq 0 ]] && [[ $diff_out_fail -eq 0 ]]; then
+				((PASS++))
+			elif [[ $BLESS ]]; then
+				echo -ne "$stdout" >$expect_stdout_file
+				echo -ne "$stderr" >$expect_stderr_file
+				((PASS++))
+			else
+				msg="\n   -> Failed: $(color $BOLD $RED)$i$(color) with error code $?"
+				echo -e "$msg"
+
+				if [[ $diff_out_fail -eq 2 ]]; then
+					echo "File not found. Try '$0 test bless'"
+				fi
+				if [[ $diff_out_fail -ne 0 ]]; then
+					echo -e "=======$(color $GREEN)STDOUT$(color)=========="
+					echo "$diff_out"
+				fi
+
+				if [[ $diff_err_fail -eq 2 ]]; then
+					echo "File not found. Try '$0 test bless'"
+				fi
+				if [[ $diff_err_fail -ne 0 ]]; then
+					echo -e "=======$(color $RED)STDERR$(color)=========="
+					echo "$diff_err"
+				fi
+				((FAIL++))
+			fi
+			((COUNT++))
+		fi
+
+	done
+
+	echo -e "\n ===> $(color $GREEN)$PASS/$COUNT$(color) passed : $(color $RED)$FAIL/$COUNT$(color) failed"
+	if [[ $FAIL -ne 0 ]]; then
+		echo -e "$(color $RED)$FAIL test(s)$(color) failed"
+		exit 1
+	fi
+	clean_output
 }
 
 if [[ ! $RUN_TYPE ]]; then
-	RUN_TYPE=run
+ 	RUN_TYPE=run
 fi
 
 FILE=${@: -1}
@@ -37,6 +129,8 @@ for arg in "$@"; do
 		WASM=true
 	elif [[ $arg == "test" ]]; then
 		TEST=true
+	elif [[ $arg == "bless" ]]; then
+		BLESS=true
 	fi
 done
 
@@ -46,28 +140,29 @@ fi
 
 clean_output
 if [[ $TEST ]]; then
-	OUT_PATH="$OUT_DIR/$OUT_NAME"
+	OUT_BUILD_PATH="$OUT_BUILD/$OUT_NAME"
 	build
-	echo "[ Running Tests ]"
-	# run tests
-	clean_output
+	run-tests
+	if [[ ! $WASM ]] && [[ ! $BUILD ]]; then
+		exit 0
+	fi
 fi
 
 if [[ $WASM ]]; then
 	GOOS=js
 	GOARCH=wasm
-	cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" ./$OUT_DIR
-	cp ./web/* ./$OUT_DIR/
-	rm ./$OUT_DIR/*.go
+	cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" ./$OUT_BUILD
+	cp ./web/* ./$OUT_BUILD/
+	rm ./$OUT_BUILD/*.go
 
-	cp -r ./examples ./$OUT_DIR
+	cp -r ./examples ./$OUT_BUILD
 	python3 ./examples/example-index.py
-	rm ./$OUT_DIR/examples/*.py
+	rm ./$OUT_BUILD/examples/*.py
 
-	OUT_PATH="$OUT_DIR/main.wasm"
+	OUT_BUILD_PATH="$OUT_BUILD/main.wasm"
 	echo "[ Building for WASM ]"
 else
-	OUT_PATH="$OUT_DIR/$OUT_NAME"
+	OUT_BUILD_PATH="$OUT_BUILD/$OUT_NAME"
 	echo "[ Building for native ]"
 fi
 build
@@ -75,13 +170,13 @@ build
 if [[ ! $BUILD ]] && [[ $WASM ]]; then
 	go run web/main.go
 elif [[ ! $BUILD ]] && [[ -f $FILE ]]; then
-	OUT_MSG="[ Running on $FILE ]"
+	OUT_MSG="[ Running $FILE ]"
 	echo $OUT_MSG
 	for i in $(seq ${#OUT_MSG}); do
 		echo -n "-"
 	done
 	echo
-	./$OUT_PATH $RUN_TYPE $FILE
+	./$OUT_BUILD_PATH $RUN_TYPE $FILE
 elif [[ ! $BUILD ]] && [[ ! $TEST ]]; then
 	echo "Invalid file"
 	exit_usage
