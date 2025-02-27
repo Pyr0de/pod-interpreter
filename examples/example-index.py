@@ -2,7 +2,7 @@ import os
 import json
 
 examples_dir = "examples"
-out_file = os.path.join("out", "examples", "example_index.json")
+out_file = os.path.join("out", "build", "examples", "example_index.json")
 
 file_info = []
 

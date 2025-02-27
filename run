@@ -30,14 +30,14 @@ exit_usage() {
 }
 
 clean_output() {
-	mkdir -p $OUT_DIR
+	mkdir -p $OUT_BUILD
 	# checks that out_dir is set properly (or atleast i try)
 	if [[ ! "$OUT_DIR/.." -ef $(pwd) ]]; then
 		echo "invalid out_dir"
 		exit 1
 	fi
 	rm --preserve-root -rf $OUT_DIR
-	mkdir -p $OUT_DIR
+	mkdir -p $OUT_BUILD
 }
 
 build() {
