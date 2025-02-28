@@ -69,6 +69,7 @@ run-tests() {
 			echo "$exitcode_msg$(<$P_STDOUT)" >$P_STDOUT
 			echo "$exitcode_msg$(<$P_STDERR)" >$P_STDERR
 			
+			# Remove ending \n
 			echo "$(<$P_STDOUT)" >$P_STDOUT
 			echo "$(<$P_STDERR)" >$P_STDERR
 				
@@ -126,6 +127,7 @@ run-tests() {
 		echo -e "$(color $RED)$FAIL test(s)$(color) failed"
 		exit 1
 	fi
+	clean_output
 }
 
 if [[ ! $RUN_TYPE ]]; then
