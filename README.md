@@ -44,7 +44,8 @@ Interpreter Arguments
 Script Arguments (not set by default)
 - `build`: builds for selected target
 - `wasm`: sets target to WASM
-- `test`: Runs tests 
+- `test`: Runs tests
+- `bless`: (only with `test`) saves state of stdout & stderr for future testing
 
 Web server starts at localhost:8080. Web interpreter files can be found in `./out`
 ```sh
@@ -67,6 +68,7 @@ Web server starts at localhost:8080. Web interpreter files can be found in `./ou
 - [ ] File read/write
 - [ ] Stdin
 - [ ] Stdlib
+- [X] Testing
 
 ## References
 - [Crafting Interpreters](https://craftinginterpreters.com/)
