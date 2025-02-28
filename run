@@ -86,20 +86,28 @@ run-tests() {
 				msg="\n   -> Failed: $(color $BOLD $RED)$i$(color) with error code $?"
 				echo -e "$msg"
 
-				if [[ $diff_out_fail -eq 2 ]]; then
-					echo "File not found. Try '$0 test bless'"
-				fi
 				if [[ $diff_out_fail -ne 0 ]]; then
 					echo -e "=======$(color $GREEN)STDOUT$(color)=========="
-					echo "$diff_out"
+					if [[ $diff_out_fail -eq 1 ]];then 
+						echo "$diff_out"
+					fi
+				fi
+				if [[ $diff_out_fail -eq 2 ]]; then
+					echo "$(<$P_STDOUT)"
 				fi
 
-				if [[ $diff_err_fail -eq 2 ]]; then
-					echo "File not found. Try '$0 test bless'"
-				fi
 				if [[ $diff_err_fail -ne 0 ]]; then
 					echo -e "=======$(color $RED)STDERR$(color)=========="
-					echo "$diff_err"
+					if [[ $diff_err_fail -eq 1 ]];then 
+						echo "$diff_err"
+					fi
+				fi
+				if [[ $diff_err_fail -eq 2 ]]; then
+					echo "$(<$P_STDERR)"
+				fi
+
+				if [[ $diff_err_fail -eq 2 ]] || [[ $diff_out_fail -eq 2 ]]; then
+					echo -e "\nFile not found. Try '$0 test bless'"
 				fi
 				((FAIL++))
 			fi
