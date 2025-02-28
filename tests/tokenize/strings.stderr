@@ -1,0 +1,4 @@
+ExitCode: 65
+[line 5] Unterminated String: "fails
+[line 6] Unterminated String: 'fails again
+Tokenize Error

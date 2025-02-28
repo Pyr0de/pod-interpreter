@@ -1,7 +1,0 @@
-ExitCode: 0
-EQUAL = <nil> 1
-LEFT_BRACE { <nil> 1
-EQUAL_EQUAL == <nil> 1
-EQUAL = <nil> 1
-RIGHT_BRACE } <nil> 1
-EOF  null

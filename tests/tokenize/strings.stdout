@@ -1,0 +1,8 @@
+ExitCode: 65
+STRING "simple" simple 1
+STRING "space1 space2 space3" space1 space2 space3 2
+STRING "quotes '' ' " quotes '' '  3
+STRING 'single quotes' single quotes 4
+STRING "fails fail 5
+STRING 'fails again fails agai 6
+EOF  null

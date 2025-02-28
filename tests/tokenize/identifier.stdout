@@ -1,0 +1,9 @@
+ExitCode: 0
+IDENTIFIER identifier <nil> 1
+IDENTIFIER identifier1_2_3 <nil> 2
+IDENTIFIER abc23 <nil> 3
+IDENTIFIER asb2 <nil> 4
+IDENTIFIER hello <nil> 4
+NUMBER 2 2 5
+IDENTIFIER abc <nil> 5
+EOF  null

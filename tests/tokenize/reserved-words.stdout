@@ -1,0 +1,13 @@
+ExitCode: 0
+FOR for <nil> 1
+WHILE while <nil> 2
+IF if <nil> 3
+INIT let <nil> 3
+ELSE else <nil> 4
+FUNC func <nil> 5
+RETURN return <nil> 6
+PRINT print <nil> 6
+TRUE true <nil> 7
+FALSE false <nil> 7
+IDENTIFIER for_while <nil> 8
+EOF  null

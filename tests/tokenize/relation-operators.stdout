@@ -1,0 +1,23 @@
+ExitCode: 0
+EQUAL = <nil> 1
+LEFT_BRACE { <nil> 1
+EQUAL_EQUAL == <nil> 1
+EQUAL = <nil> 1
+RIGHT_BRACE } <nil> 1
+BANG ! <nil> 2
+BANG_EQUAL != <nil> 2
+EQUAL_EQUAL == <nil> 2
+EQUAL = <nil> 3
+BANG ! <nil> 3
+GREATER_EQUAL >= <nil> 4
+BANG_EQUAL != <nil> 5
+EQUAL = <nil> 5
+LESS_EQUAL <= <nil> 6
+EQUAL = <nil> 6
+GREATER > <nil> 6
+GREATER_EQUAL >= <nil> 7
+LESS_EQUAL <= <nil> 7
+BANG_EQUAL != <nil> 8
+GREATER > <nil> 8
+LESS < <nil> 8
+EOF  null
