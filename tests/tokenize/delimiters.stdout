@@ -1,0 +1,10 @@
+ExitCode: 0
+LEFT_PAREN ( <nil> 1
+LEFT_PAREN ( <nil> 1
+RIGHT_PAREN ) <nil> 1
+LEFT_BRACE { <nil> 2
+LEFT_BRACE { <nil> 2
+RIGHT_BRACE } <nil> 2
+LEFT_BRACE { <nil> 3
+RIGHT_PAREN ) <nil> 4
+EOF  null

@@ -1,0 +1,9 @@
+ExitCode: 65
+PLUS + <nil> 1
+EQUAL = <nil> 1
+NEG - <nil> 2
+STAR * <nil> 2
+COMMA , <nil> 3
+COMMA , <nil> 4
+LEFT_PAREN ( <nil> 4
+EOF  null
