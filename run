@@ -45,6 +45,10 @@ build() {
 }
 
 run-tests() {
+	exit_code_to_temp_file() {
+		exitcode_msg="ExitCode: $1"
+		echo "$(echo "$exitcode_msg"; echo -n "$(<$2)")" >$2
+	}
 	echo "[ Running Tests ]"
 
 	mkdir -p $TEST_DIR
@@ -63,15 +67,8 @@ run-tests() {
 			./$OUT_BUILD_PATH $run_type $i >$P_STDOUT 2>$P_STDERR
 			exit_code=$?
 
-			# Just for ending \n
-			exitcode_msg=$(echo -e "ExitCode: $exit_code"; echo -n x); exitcode_msg=${exitcode_msg%x}
-
-			echo "$exitcode_msg$(<$P_STDOUT)" >$P_STDOUT
-			echo "$exitcode_msg$(<$P_STDERR)" >$P_STDERR
-			
-			# Remove ending \n
-			echo "$(<$P_STDOUT)" >$P_STDOUT
-			echo "$(<$P_STDERR)" >$P_STDERR
+			exit_code_to_temp_file $exit_code $P_STDOUT
+			exit_code_to_temp_file $exit_code $P_STDERR
 				
 			expect_stdout_file="$test_path.stdout"
 			expect_stderr_file="$test_path.stderr"
@@ -87,6 +84,7 @@ run-tests() {
 			elif [[ $BLESS ]]; then
 				echo "$(<$P_STDOUT)" >$expect_stdout_file
 				echo "$(<$P_STDERR)" >$expect_stderr_file
+				echo -e "\n    > Saved output state of $(color $BOLD $BLUE)$i$(color)"
 				((PASS++))
 			else
 				msg="\n   -> Failed: $(color $BOLD $RED)$i$(color) with error code $?"
