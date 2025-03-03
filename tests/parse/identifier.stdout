@@ -1,0 +1,7 @@
+ExitCode: 0
+(+ 10 abc)
+(+ b aa)
+(+ (+ he (* llo worl)) d)
+(+ asdsd 1234)
+(* abcd 1000)
+(* asb abc)

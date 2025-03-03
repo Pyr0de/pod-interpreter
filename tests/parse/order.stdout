@@ -1,0 +1,8 @@
+ExitCode: 0
+(* (group (+ 10 10) null) 12)
+(group (+ (- 100 null) (* 23 12)) null)
+(group (group (group 10 null) null) null)
+(group (! true null) null)
+(>= (group (- (* 10 12) (* (group 12 null) 12)) null) (+ 10 15))
+(+ (group (+ 10 (/ 23 12)) null) (* 125 (- 235 null)))
+(+ (- 12 null) (* (- 13 null) 13))
