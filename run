@@ -41,14 +41,77 @@ clean_output() {
 }
 
 build() {
+	echo -ne "$(color $BOLD $RED)"
 	go build -o $OUT_BUILD_PATH ./cmd/pod-interpreter
+	exit_code=$?
+	echo -ne "$(color)"
+	if [[ $exit_code -ne 0 ]]; then
+		exit $exit_code
+	fi
 }
-
-run-tests() {
+run-test() {
 	exit_code_to_temp_file() {
 		exitcode_msg="ExitCode: $1"
 		echo "$(echo "$exitcode_msg"; echo -n "$(<$2)")" >$2
 	}
+	run_type=$2
+	test_path=$3
+
+	./$OUT_BUILD_PATH $run_type $1 >$P_STDOUT 2>$P_STDERR
+	exit_code=$?
+
+	exit_code_to_temp_file $exit_code $P_STDOUT
+	exit_code_to_temp_file $exit_code $P_STDERR
+		
+	expect_stdout_file="$test_path.stdout"
+	expect_stderr_file="$test_path.stderr"
+
+	diff_out=$(diff $P_STDOUT $expect_stdout_file 2>/dev/null)
+	diff_out_fail=$?
+	
+	diff_err=$(diff $P_STDERR $expect_stderr_file 2>/dev/null)
+	diff_err_fail=$?
+
+	if [[ $diff_err_fail -eq 0 ]] && [[ $diff_out_fail -eq 0 ]]; then
+		((PASS++))
+	elif [[ $BLESS ]]; then
+		echo "$(<$P_STDOUT)" >$expect_stdout_file
+		echo "$(<$P_STDERR)" >$expect_stderr_file
+		echo -e "\n    > Saved output state of $(color $BOLD $BLUE)$1$(color)"
+		((PASS++))
+	else
+		msg="\n   -> Failed: $(color $BOLD $RED)$1$(color) with error code $?"
+		echo -e "$msg"
+
+		if [[ $diff_out_fail -ne 0 ]]; then
+			echo -e "=======$(color $GREEN)STDOUT$(color)=========="
+			if [[ $diff_out_fail -eq 1 ]];then 
+				echo "$diff_out"
+			fi
+		fi
+		if [[ $diff_out_fail -eq 2 ]]; then
+			echo "$(<$P_STDOUT)"
+		fi
+
+		if [[ $diff_err_fail -ne 0 ]]; then
+			echo -e "=======$(color $RED)STDERR$(color)=========="
+			if [[ $diff_err_fail -eq 1 ]];then 
+				echo "$diff_err"
+			fi
+		fi
+		if [[ $diff_err_fail -eq 2 ]]; then
+			echo "$(<$P_STDERR)"
+		fi
+
+		if [[ $diff_err_fail -eq 2 ]] || [[ $diff_out_fail -eq 2 ]]; then
+			echo -e "\nFile not found. Try '$0 test bless'"
+		fi
+		((FAIL++))
+	fi
+	((COUNT++))
+}
+
+tests() {
 	echo "[ Running Tests ]"
 
 	mkdir -p $TEST_DIR
@@ -59,66 +122,27 @@ run-tests() {
 	PASS=0
 	FAIL=0
 
-	for i in $(find . -iregex "\.\/tests\/.*\.\(pod\|pd\)"); do
-		if [[ $i =~ (\.\/tests\/([^\/]+)[^.]+) ]]; then
-			run_type=${BASH_REMATCH[2]}
-			test_path=${BASH_REMATCH[1]}
-
-			./$OUT_BUILD_PATH $run_type $i >$P_STDOUT 2>$P_STDERR
-			exit_code=$?
-
-			exit_code_to_temp_file $exit_code $P_STDOUT
-			exit_code_to_temp_file $exit_code $P_STDERR
-				
-			expect_stdout_file="$test_path.stdout"
-			expect_stderr_file="$test_path.stderr"
-
-			diff_out=$(diff $P_STDOUT $expect_stdout_file 2>/dev/null)
-			diff_out_fail=$?
-			
-			diff_err=$(diff $P_STDERR $expect_stderr_file 2>/dev/null)
-			diff_err_fail=$?
-
-			if [[ $diff_err_fail -eq 0 ]] && [[ $diff_out_fail -eq 0 ]]; then
-				((PASS++))
-			elif [[ $BLESS ]]; then
-				echo "$(<$P_STDOUT)" >$expect_stdout_file
-				echo "$(<$P_STDERR)" >$expect_stderr_file
-				echo -e "\n    > Saved output state of $(color $BOLD $BLUE)$i$(color)"
-				((PASS++))
-			else
-				msg="\n   -> Failed: $(color $BOLD $RED)$i$(color) with error code $?"
-				echo -e "$msg"
-
-				if [[ $diff_out_fail -ne 0 ]]; then
-					echo -e "=======$(color $GREEN)STDOUT$(color)=========="
-					if [[ $diff_out_fail -eq 1 ]];then 
-						echo "$diff_out"
-					fi
-				fi
-				if [[ $diff_out_fail -eq 2 ]]; then
-					echo "$(<$P_STDOUT)"
-				fi
-
-				if [[ $diff_err_fail -ne 0 ]]; then
-					echo -e "=======$(color $RED)STDERR$(color)=========="
-					if [[ $diff_err_fail -eq 1 ]];then 
-						echo "$diff_err"
-					fi
-				fi
-				if [[ $diff_err_fail -eq 2 ]]; then
-					echo "$(<$P_STDERR)"
-				fi
-
-				if [[ $diff_err_fail -eq 2 ]] || [[ $diff_out_fail -eq 2 ]]; then
-					echo -e "\nFile not found. Try '$0 test bless'"
-				fi
-				((FAIL++))
-			fi
-			((COUNT++))
+	if [[ -f $FILE ]]; then
+		if [[ $FILE =~ (tests\/([^\/]+)[^.]+).[pd|pod]+ ]]; then
+				run_type=${BASH_REMATCH[2]}
+				test_path=${BASH_REMATCH[1]}
+				run-test $FILE $run_type $test_path
 		fi
+	else
+		search_path="."
+		if [[ -d $FILE ]]; then
+			search_path="$FILE"
+		fi
+		for i in $(find $search_path -iregex ".*\.\(pod\|pd\)"); do
+			if [[ $i =~ (tests\/([^\/]+)[^.]+).[pd|pod]+ ]]; then
+				run_type=${BASH_REMATCH[2]}
+				test_path=${BASH_REMATCH[1]}
+				run-test $i $run_type $test_path
+			fi
 
-	done
+		done
+	fi
+
 
 	echo -e "\n ===> $(color $GREEN)$PASS/$COUNT$(color) passed : $(color $RED)$FAIL/$COUNT$(color) failed"
 	if [[ $FAIL -ne 0 ]]; then
@@ -154,7 +178,7 @@ clean_output
 if [[ $TEST ]]; then
 	OUT_BUILD_PATH="$OUT_BUILD/$OUT_NAME"
 	build
-	run-tests
+	tests
 	if [[ ! $WASM ]] && [[ ! $BUILD ]]; then
 		exit 0
 	fi

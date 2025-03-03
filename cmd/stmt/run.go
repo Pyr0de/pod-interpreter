@@ -177,14 +177,14 @@ func (s StmtFuncCall)Run() bool {
 	}
 	if len(f.Parameters) != len(s.Parameters) {
 		fmt.Printf(
-			`[line %d] Error: Mismatched number of parameters
-			expected %d parameters, found %d parameters\n`,
+			"[line %d] Error: Mismatched number of parameters "+
+			"expected %d parameters, found %d parameters\n",
 			s.Name.Line, len(f.Parameters), len(s.Parameters),
 		)
 		return true
 	}
 	args_vals := []token.Token{}
-	for i := 0; i < len(s.Parameters); i++ {
+	for i := range len(s.Parameters) {
 		val, err := eval.Evaluate(s.Parameters[i])
 		if err {
 			return true
@@ -195,7 +195,7 @@ func (s StmtFuncCall)Run() bool {
 	prev_env := env.SwapEnv(env.NewEnv())
 	env.InitFunc(s.Name.Raw, e.Functions[s.Name.Raw])
 
-	for i := 0; i < len(s.Parameters); i++ {
+	for i := range len(s.Parameters) {
 		initVar(f.Parameters[i], args_vals[i], true)
 	}
 
