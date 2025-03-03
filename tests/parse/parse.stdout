@@ -1,0 +1,7 @@
+ExitCode: 0
+(+ 1 2)
+(group (+ 1 3) null)
+(group (+ 1 (* 2 3)) null)
+true
+false
+(+ asd 1)
