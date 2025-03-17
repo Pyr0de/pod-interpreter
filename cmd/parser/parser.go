@@ -74,13 +74,18 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 				}
 			}
 			exp, err := ParseExpression(tokens[i+1:j])
-			if err != nil || len(exp) != 1{
-				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected an expression", tokens[j].Line)
+			if err != nil || len(exp) > 1 {
+				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected an expression\n", tokens[j].Line)
 				return code, true
 			}
 
+			to_print := group.Group{Operand1: token.Token{TokenType: token.STRING, Raw: "", Value: ""}}
+			if len(exp) > 0 {
+				to_print = exp[0]
+			}
+
 			code = append(code, stmt.Stmt{
-				Stype: token.PRINT, Statement: stmt.StmtPrint{Expression: exp[0]},
+				Stype: token.PRINT, Statement: stmt.StmtPrint{Expression: to_print},
 			})
 			i = j;
 		case token.INIT:
