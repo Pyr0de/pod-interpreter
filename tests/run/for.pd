@@ -1,0 +1,9 @@
+for let a = 0; a < 10; a = a + 1 {
+	print a;
+}
+print;
+let m = 0;
+for ;m < 10;; {
+	m = m + 1;
+}
+print m;

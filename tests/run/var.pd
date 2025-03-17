@@ -1,0 +1,19 @@
+let a = 10;
+let b = -10;
+let c = 10 * 10;
+let d = "abc" + "efg";
+let e = false;
+
+print a;
+print b;
+print c;
+print d;
+print e;
+
+a = 12;
+print a;
+b = "abc";
+print b;
+
+print z;
+print a;

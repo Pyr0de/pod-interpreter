@@ -1,0 +1,39 @@
+let a = true;
+
+if true {
+	print "hello";
+}
+
+if a {
+	print "hello2";
+}
+
+if false || true {
+	print "hello3"
+}
+
+if !a {
+	print "error";
+}else {
+	print "else";
+}
+
+if a {
+	print "hello4";
+}else {
+	print "error2";
+}
+
+if !a {
+	print "error3";
+}else if a {
+	print "else if";
+}
+
+if !a {
+	print "error4"
+}else if !a {
+	print "error5"
+}else {
+	print "else2"
+}
