@@ -1,6 +1,7 @@
 package stmt
 
 import (
+	"github.com/Pyr0de/pod-interpreter/cmd/env"
 	"github.com/Pyr0de/pod-interpreter/cmd/group"
 	"github.com/Pyr0de/pod-interpreter/cmd/token"
 )
@@ -53,6 +54,7 @@ type StmtFunc struct {
 	Name token.Token
 	Parameters []token.Token
 	Block StmtBlock
+	Env *env.Environment
 }
 
 type StmtFuncCall struct {

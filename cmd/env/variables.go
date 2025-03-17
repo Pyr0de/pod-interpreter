@@ -11,8 +11,8 @@ var curr_env *Environment = NewEnv()
 
 type Environment struct {
 	store map[string]token.Token
-	Functions map[string]token.Token
-	global *Environment
+	Functions map[string]FunctionEntry
+	Global *Environment
 }
 
 
@@ -56,19 +56,19 @@ func findVar(variable string) *Environment {
 		if _, ok := curr.store[variable]; ok {
 			return curr
 		}
-		curr = curr.global
+		curr = curr.Global
 	}
 	return nil
 }
 
 func NextScope() {
 	c := NewEnv()
-	c.global = curr_env
+	c.Global = curr_env
 	curr_env = c
 }
 
 func PrevScope() {
-	curr_env = curr_env.global
+	curr_env = curr_env.Global
 }
 
 func SwapEnv(swap *Environment) *Environment {
@@ -80,7 +80,11 @@ func SwapEnv(swap *Environment) *Environment {
 func NewEnv() *Environment {
 	return &Environment{
 		store: make(map[string]token.Token),
-		Functions: make(map[string]token.Token),
-		global: nil,
+		Functions: make(map[string]FunctionEntry),
+		Global: nil,
 	}
+}
+
+func CurrEnv() *Environment {
+	return curr_env
 }

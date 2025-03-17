@@ -170,8 +170,8 @@ func (s StmtFuncCall)Run() bool {
 		return true
 	}
 
-
-	f, ok := e.Functions[s.Name.Raw].Value.(*StmtFunc)
+	func_entry := e.Functions[s.Name.Raw]
+	f, ok := func_entry.TokenPointerToFunc.Value.(*StmtFunc)
 	if !ok {
 		panic("Found something other than stmtfunc")
 	}
@@ -192,8 +192,10 @@ func (s StmtFuncCall)Run() bool {
 		args_vals = append(args_vals, val)
 	}
 
-	prev_env := env.SwapEnv(env.NewEnv())
-	env.InitFunc(s.Name.Raw, e.Functions[s.Name.Raw])
+	new_env := env.NewEnv()
+	new_env.Global = func_entry.Env
+	
+	prev_env := env.SwapEnv(new_env)
 
 	for i := range len(s.Parameters) {
 		initVar(f.Parameters[i], args_vals[i], true)

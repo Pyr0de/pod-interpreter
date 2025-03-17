@@ -146,7 +146,7 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			}
 			if tokens[j].TokenType != token.R_BRACE || count > 0 {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected token \"}\"\n",
-					tokens[i].Line, tokens[i].Raw)
+					tokens[i].Line)
 				return code, true
 			}
 			s, e := Parse(tokens[i+1:j])
@@ -245,7 +245,7 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			}
 			if tokens[j].TokenType != token.R_BRACE || count > 0 {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected token \"}\"\n",
-					tokens[i].Line, tokens[i].Raw)
+					tokens[i].Line)
 				return code, true
 			}
 			s, e := Parse(tokens[i+1:j])
@@ -299,7 +299,7 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			}
 			if tokens[j].TokenType != token.R_BRACE || count > 0 {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected token \"}\"\n",
-					tokens[i].Line, tokens[i].Raw)
+					tokens[i].Line)
 				return code, true
 			}
 			s, e := Parse(tokens[i+1:j])
@@ -372,7 +372,7 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			}
 			if tokens[j].TokenType != token.R_BRACE || count > 0 {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected token \"}\"\n",
-					tokens[i].Line, tokens[i].Raw)
+					tokens[i].Line)
 				return code, true
 			}
 			s, e := Parse(tokens[i+1:j])
@@ -380,7 +380,7 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 				return code, true
 			}
 			code = append(code, stmt.Stmt{
-				Stype: token.FUNC, Statement: stmt.StmtFunc{Name: func_name, Parameters: parameters, Block: stmt.StmtBlock{Block: s}},
+				Stype: token.FUNC, Statement: stmt.StmtFunc{Name: func_name, Parameters: parameters, Block: stmt.StmtBlock{Block: s}, Env: nil},
 			})
 			i = j
 		case token.L_BRACE:
@@ -399,7 +399,7 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			}
 			if tokens[j].TokenType != token.R_BRACE || count > 0{
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected token \"}\"\n",
-					tokens[i].Line, tokens[i].Raw)
+					tokens[i].Line)
 				return code, true
 			}
 			s, err := Parse(tokens[i+1:j])

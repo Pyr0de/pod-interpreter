@@ -1,1 +1,4 @@
-ExitCode: 0
+ExitCode: 66
+[line 37] Error: Uninitialized function "y"
+Error
+Error

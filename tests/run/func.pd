@@ -19,3 +19,20 @@ func rec(p) {
 	}
 }
 rec(0);
+
+
+{
+	let k = 1;
+
+	func x() {
+		print k;
+	}
+
+	{
+		func y() {
+			x();
+		}
+		y();
+	}
+	y();
+}
