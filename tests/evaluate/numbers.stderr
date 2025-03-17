@@ -1,0 +1,4 @@
+ExitCode: 66
+Cannot use operator "||" on type NUMBER
+Cannot use operator "&&" on type NUMBER
+Cannot use operator "!" on type NUMBER
