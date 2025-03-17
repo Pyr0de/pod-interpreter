@@ -1,0 +1,21 @@
+func a() {
+	print "hello";
+}
+
+a();
+
+func b(m,n) {
+	print m;
+	print n;
+}
+
+b(10 + 1, true);
+
+func rec(p) {
+	if p > 3 {
+		print p;
+	}else {
+		rec(p+1);
+	}
+}
+rec(0);
