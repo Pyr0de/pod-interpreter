@@ -1,4 +1,5 @@
 //go:build !wasm
+
 package main
 
 import (
@@ -14,9 +15,9 @@ func main() {
 			fmt.Fprintln(os.Stderr, "Could not read file:", os.Args[2])
 			os.Exit(1)
 		}
-		e = Interpreter(os.Args[1],string(f))
+		e = Interpreter(os.Args[1], string(f))
 	}
-	if e == 1{
+	if e == 1 {
 		fmt.Println("Usage:", os.Args[0], "{tokenize/parse} {filename}")
 	}
 	os.Exit(e)

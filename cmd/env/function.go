@@ -17,11 +17,11 @@ func InitFunc(name string, token_pointer_to_func token.Token) bool {
 	if token_pointer_to_func.TokenType != token.FUNC {
 		panic(fmt.Sprintln("Expected token to be func with address to StmtFunc, got", token_pointer_to_func))
 	}
-	e := FindFunc(name) 
+	e := FindFunc(name)
 	if e != nil {
 		fmt.Fprintf(os.Stderr, "[line %d] Error: \"%s\" is already declared cannot redeclare\n", token_pointer_to_func.Line, name)
 		return true
-	}else {
+	} else {
 		e = curr_env
 	}
 	e.Functions[name] = FunctionEntry{Env: curr_env, TokenPointerToFunc: token_pointer_to_func}

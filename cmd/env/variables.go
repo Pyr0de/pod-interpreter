@@ -10,14 +10,13 @@ import (
 var curr_env *Environment = NewEnv()
 
 type Environment struct {
-	store map[string]token.Token
+	store     map[string]token.Token
 	Functions map[string]FunctionEntry
-	Global *Environment
+	Global    *Environment
 }
 
-
 func InitVar(variable string, val token.Token) bool {
-	if findVar(variable) == nil{
+	if findVar(variable) == nil {
 		curr_env.store[variable] = val
 		return false
 	}
@@ -79,9 +78,9 @@ func SwapEnv(swap *Environment) *Environment {
 
 func NewEnv() *Environment {
 	return &Environment{
-		store: make(map[string]token.Token),
+		store:     make(map[string]token.Token),
 		Functions: make(map[string]FunctionEntry),
-		Global: nil,
+		Global:    nil,
 	}
 }
 

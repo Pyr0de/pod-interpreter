@@ -9,24 +9,24 @@ import (
 	"github.com/Pyr0de/pod-interpreter/cmd/token"
 )
 
-func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
+func Parse(tokens []token.Token) ([]stmt.Stmt, bool) {
 	brace_count := 0
 	code := []stmt.Stmt{}
 	for i := 0; i < len(tokens); i++ {
 		k := tokens[i]
-		
+
 		// Parse function calling
 		if i+1 < len(tokens) &&
-		tokens[i].TokenType == token.IDENTIFIER &&
-		tokens[i+1].TokenType == token.L_BRACKET {
-			j := i+2
+			tokens[i].TokenType == token.IDENTIFIER &&
+			tokens[i+1].TokenType == token.L_BRACKET {
+			j := i + 2
 			args := []group.Group{}
 			start := j
 			for ; j < len(tokens); j++ {
 				if tokens[j].TokenType == token.R_BRACKET {
 					if j > start {
 						arg, err := ParseExpression(tokens[start:j])
-						if err != nil || len(arg) != 1{
+						if err != nil || len(arg) != 1 {
 							//print error
 							fmt.Fprintln(os.Stderr, "Parser Error")
 							return code, true
@@ -46,18 +46,18 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 					}
 					// parse expression from tokens[start:j]
 					arg, err := ParseExpression(tokens[start:j])
-					if err != nil || len(arg) != 1{
+					if err != nil || len(arg) != 1 {
 						//print error
 						fmt.Fprintln(os.Stderr, "Parser Error")
 						return code, true
 					}
 					args = append(args, arg[0])
-					start = j+1
+					start = j + 1
 				}
 			}
 			i = j
 			code = append(code, stmt.Stmt{Stype: k.TokenType, Statement: stmt.StmtFuncCall{
-				Name: k,
+				Name:       k,
 				Parameters: args,
 			}})
 			if i+1 < len(tokens) && tokens[i+1].TokenType == token.SEMICOLON {
@@ -67,13 +67,13 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 		}
 		switch k.TokenType {
 		case token.PRINT:
-			j := i+1
-			for ;j < len(tokens);j++ {
+			j := i + 1
+			for ; j < len(tokens); j++ {
 				if tokens[j].TokenType == token.SEMICOLON {
 					break
 				}
 			}
-			exp, err := ParseExpression(tokens[i+1:j])
+			exp, err := ParseExpression(tokens[i+1 : j])
 			if err != nil || len(exp) > 1 {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected an expression\n", tokens[j].Line)
 				return code, true
@@ -87,20 +87,20 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			code = append(code, stmt.Stmt{
 				Stype: token.PRINT, Statement: stmt.StmtPrint{Expression: to_print},
 			})
-			i = j;
+			i = j
 		case token.INIT:
-			j := i+1
-			for ;j < len(tokens);j++ {
+			j := i + 1
+			for ; j < len(tokens); j++ {
 				if tokens[j].TokenType == token.SEMICOLON {
 					break
 				}
 			}
-			exp, err := ParseExpression(tokens[i+1:j])
-			if err != nil || len(exp) != 1{
+			exp, err := ParseExpression(tokens[i+1 : j])
+			if err != nil || len(exp) != 1 {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected an expression", tokens[j].Line)
 				return code, true
 			}
-			if exp[0].Operator.TokenType != token.EQUAL && exp[0].Operator.TokenType != token.None{
+			if exp[0].Operator.TokenType != token.EQUAL && exp[0].Operator.TokenType != token.None {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Malformed init\n", tokens[j].Line)
 				return code, true
 			}
@@ -112,28 +112,28 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			})
 			i = j
 		case token.IF:
-			j := i+1
-			for ;j < len(tokens);j++ {
+			j := i + 1
+			for ; j < len(tokens); j++ {
 				if tokens[j].TokenType == token.L_BRACE {
 					break
 				}
 			}
-			
+
 			if tokens[j].TokenType != token.L_BRACE {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected expression, found \"%s\"",
 					tokens[j].Line, tokens[j].Raw)
 				return code, true
 			}
-			exp, err := ParseExpression(tokens[i+1:j])
+			exp, err := ParseExpression(tokens[i+1 : j])
 			if err != nil || len(exp) != 1 {
-				
+
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected expression\n", tokens[j].Line)
 				return code, true
 			}
 			i = j
 			j++
 			count := 1
-			for ;j < len(tokens);j++ {
+			for ; j < len(tokens); j++ {
 				if tokens[j].TokenType == token.R_BRACE {
 					count--
 					if count <= 0 {
@@ -149,7 +149,7 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 					tokens[i].Line)
 				return code, true
 			}
-			s, e := Parse(tokens[i+1:j])
+			s, e := Parse(tokens[i+1 : j])
 			if e {
 				return code, true
 			}
@@ -158,10 +158,10 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			})
 			i = j
 		case token.ELSE:
-			if iffy, ok := code[len(code) - 1].Statement.(stmt.StmtIf); ok {
-				j := i+1
+			if iffy, ok := code[len(code)-1].Statement.(stmt.StmtIf); ok {
+				j := i + 1
 				count := 0
-				for ;j < len(tokens); j++ {
+				for ; j < len(tokens); j++ {
 					if tokens[j].TokenType == token.R_BRACE {
 						count--
 						if count <= 0 {
@@ -172,17 +172,17 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 						count++
 					}
 				}
-				if tokens[j].TokenType != token.R_BRACE || count > 0{
+				if tokens[j].TokenType != token.R_BRACE || count > 0 {
 					fmt.Fprintf(os.Stderr, "[line %d] Error: Expected token \"}\"\n",
-					tokens[i].Line)
+						tokens[i].Line)
 					return code, true
 				}
 				if count < 0 {
 					fmt.Fprintf(os.Stderr, "[line %d] Error: Found \"}\"\n",
-					tokens[i].Line)
+						tokens[i].Line)
 					return code, true
 				}
-				s, err := Parse(tokens[i+1:j+1])
+				s, err := Parse(tokens[i+1 : j+1])
 				if err {
 					return code, true
 				}
@@ -193,11 +193,11 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 				isElse := false
 				if if_stmt, ok := s[0].Statement.(stmt.StmtIf); ok {
 					curr.Else = &if_stmt
-				}else if else_stmt, ok := s[0].Statement.(stmt.StmtBlock); ok {
+				} else if else_stmt, ok := s[0].Statement.(stmt.StmtBlock); ok {
 					exp := group.Group{Operand1: token.Token{TokenType: token.TRUE}}
 					curr.Else = &stmt.StmtIf{Expression: exp, Block: else_stmt}
 					isElse = true
-				}else {
+				} else {
 					fmt.Fprintln(os.Stderr, "found something other than if/else: ", s[0])
 					return code, true
 				}
@@ -206,25 +206,25 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 					code = append(code, stmt.Stmt{Stype: token.None, Statement: stmt.StmtEmpty{}})
 				}
 				i = j
-			}else {
+			} else {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected \"if\" before \"else\"\n",
 					tokens[i].Line)
 				return code, true
 			}
 		case token.WHILE:
-			j := i+1
-			for ;j < len(tokens);j++ {
+			j := i + 1
+			for ; j < len(tokens); j++ {
 				if tokens[j].TokenType == token.L_BRACE {
 					break
 				}
 			}
-			
+
 			if tokens[j].TokenType != token.L_BRACE {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected expression, found \"%s\"",
 					tokens[j].Line, tokens[j].Raw)
 				return code, true
 			}
-			exp, err := ParseExpression(tokens[i+1:j])
+			exp, err := ParseExpression(tokens[i+1 : j])
 			if err != nil || len(exp) != 1 {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected expression\n", tokens[j].Line)
 				return code, true
@@ -232,7 +232,7 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			i = j
 			j++
 			count := 1
-			for ;j < len(tokens);j++ {
+			for ; j < len(tokens); j++ {
 				if tokens[j].TokenType == token.R_BRACE {
 					count--
 					if count <= 0 {
@@ -248,7 +248,7 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 					tokens[i].Line)
 				return code, true
 			}
-			s, e := Parse(tokens[i+1:j])
+			s, e := Parse(tokens[i+1 : j])
 			if e {
 				return code, true
 			}
@@ -257,19 +257,19 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			})
 			i = j
 		case token.FOR:
-			j := i+1
-			for ;j < len(tokens);j++ {
+			j := i + 1
+			for ; j < len(tokens); j++ {
 				if tokens[j].TokenType == token.L_BRACE {
 					break
 				}
 			}
-			
+
 			if tokens[j].TokenType != token.L_BRACE {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected expression, found \"%s\"",
 					tokens[j].Line, tokens[j].Raw)
 				return code, true
 			}
-			statements, err := Parse(tokens[i+1:j])
+			statements, err := Parse(tokens[i+1 : j])
 			if len(statements) == 2 {
 				statements = append(statements, stmt.Stmt{Stype: token.SEMICOLON, Statement: stmt.StmtExpression{}})
 			}
@@ -286,7 +286,7 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			j++
 
 			count := 1
-			for ;j < len(tokens);j++ {
+			for ; j < len(tokens); j++ {
 				if tokens[j].TokenType == token.R_BRACE {
 					count--
 					if count <= 0 {
@@ -302,16 +302,16 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 					tokens[i].Line)
 				return code, true
 			}
-			s, e := Parse(tokens[i+1:j])
+			s, e := Parse(tokens[i+1 : j])
 			if e {
 				return code, true
 			}
 			code = append(code, stmt.Stmt{
 				Stype: token.FOR, Statement: stmt.StmtFor{
 					Initialization: statements[0],
-					Condition: condition.Expression,
-					Block: stmt.StmtBlock{Block: s},
-					Step: statements[2],
+					Condition:      condition.Expression,
+					Block:          stmt.StmtBlock{Block: s},
+					Step:           statements[2],
 				},
 			})
 			i = j
@@ -319,47 +319,47 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			i++
 			if tokens[i].TokenType != token.IDENTIFIER {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected identifier after \"func\"\n",
-				tokens[i].Line)
+					tokens[i].Line)
 				return code, true
 			}
 			func_name := tokens[i]
 			i++
 			if tokens[i].TokenType != token.L_BRACKET {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected L_BRACKET(\"(\") after \"IDENTIFIER\"\n",
-				tokens[i].Line)
+					tokens[i].Line)
 				return code, true
 			}
 			parameters := []token.Token{}
 			i++
 			for i < len(tokens) && tokens[i].TokenType != token.R_BRACKET {
 				if tokens[i].TokenType == token.IDENTIFIER {
-					if tokens[i+1].TokenType == token.COMMA && tokens[i+2].TokenType == token.IDENTIFIER{
+					if tokens[i+1].TokenType == token.COMMA && tokens[i+2].TokenType == token.IDENTIFIER {
 						parameters = append(parameters, tokens[i])
 						i += 2
-					}else if tokens[i+1].TokenType == token.R_BRACKET{
+					} else if tokens[i+1].TokenType == token.R_BRACKET {
 						parameters = append(parameters, tokens[i])
 						i += 1
 						break
-					}else {
+					} else {
 						fmt.Fprintf(os.Stderr, "[line %d] Error: Malformed function declaration\n",
-						tokens[i].Line)
+							tokens[i].Line)
 						return code, true
 					}
-				}else {
+				} else {
 					fmt.Fprintf(os.Stderr, "[line %d] Error: Expected parameters, found \"%s\"\n",
-					tokens[i].Line, tokens[i].Raw)
+						tokens[i].Line, tokens[i].Raw)
 					return code, true
 				}
 			}
-			if tokens[i].TokenType != token.R_BRACKET || tokens[i+1].TokenType != token.L_BRACE{
+			if tokens[i].TokenType != token.R_BRACKET || tokens[i+1].TokenType != token.L_BRACE {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Malformed function declaration\n",
-				tokens[i].Line)
+					tokens[i].Line)
 				return code, true
 			}
 			i += 1
-			j := i+1
+			j := i + 1
 			count := 1
-			for ;j < len(tokens);j++ {
+			for ; j < len(tokens); j++ {
 				if tokens[j].TokenType == token.R_BRACE {
 					count--
 					if count <= 0 {
@@ -375,7 +375,7 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 					tokens[i].Line)
 				return code, true
 			}
-			s, e := Parse(tokens[i+1:j])
+			s, e := Parse(tokens[i+1 : j])
 			if e {
 				return code, true
 			}
@@ -385,8 +385,8 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			i = j
 		case token.L_BRACE:
 			count := 1
-			j := i+1
-			for ;j < len(tokens);j++ {
+			j := i + 1
+			for ; j < len(tokens); j++ {
 				if tokens[j].TokenType == token.R_BRACE {
 					count--
 					if count <= 0 {
@@ -397,12 +397,12 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 					count++
 				}
 			}
-			if tokens[j].TokenType != token.R_BRACE || count > 0{
+			if tokens[j].TokenType != token.R_BRACE || count > 0 {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Expected token \"}\"\n",
 					tokens[i].Line)
 				return code, true
 			}
-			s, err := Parse(tokens[i+1:j])
+			s, err := Parse(tokens[i+1 : j])
 			if err {
 				return code, true
 			}
@@ -412,16 +412,16 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 			i = j
 		default:
 			j := i
-			for ;j < len(tokens);j++ {
+			for ; j < len(tokens); j++ {
 				if tokens[j].TokenType == token.SEMICOLON {
 					break
 				}
 			}
 			exp, err := ParseExpression(tokens[i:j])
 			if j < len(tokens) {
-				exp, err = ParseExpression(tokens[i:j+1])
+				exp, err = ParseExpression(tokens[i : j+1])
 			}
-			if err != nil || len(exp) <= 0{
+			if err != nil || len(exp) <= 0 {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Unexpected token found \"%s\"\n",
 					tokens[i].Line, tokens[i].Raw)
 				return code, true
@@ -430,18 +430,18 @@ func Parse(tokens []token.Token) ([]stmt.Stmt, bool){
 				code = append(code, stmt.Stmt{
 					Stype: token.INIT, Statement: stmt.StmtAssign{Expression: exp[0], Init: false},
 				})
-			}else {
+			} else {
 				code = append(code, stmt.Stmt{
 					Stype: tokens[i].TokenType, Statement: stmt.StmtExpression{Expression: exp[0]},
 				})
 			}
-			i = j;
+			i = j
 		}
 
 	}
-	
+
 	if brace_count > 0 {
-		fmt.Fprintf(os.Stderr, "[line %d] Error: Expected brace \"}\"\n",)
+		fmt.Fprintf(os.Stderr, "[line %d] Error: Expected brace \"}\"\n")
 		return code, true
 	}
 

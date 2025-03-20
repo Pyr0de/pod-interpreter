@@ -64,46 +64,46 @@ const (
 
 type Token struct {
 	TokenType TokenType
-	Raw string
-	Value interface{}
-	Line uint
+	Raw       string
+	Value     interface{}
+	Line      uint
 }
 
-func (t Token)String() string {
+func (t Token) String() string {
 	if t.TokenType == None {
 		return t.TokenType.String()
-	}else if t.Value != nil {
+	} else if t.Value != nil {
 		return fmt.Sprint(t.Value)
-	}else {
+	} else {
 		return t.Raw
 	}
 }
 
-func (t Token)Display() {
+func (t Token) Display() {
 	fmt.Println(t.TokenType, t.Raw, t.Value, t.Line)
 }
 
-func (t Token)IsOperator() bool{
+func (t Token) IsOperator() bool {
 	return t.TokenType >= EQUAL && t.TokenType <= CARET
 }
 
-func (t Token)IsOperand() bool {
+func (t Token) IsOperand() bool {
 	return t.TokenType >= STRING && t.TokenType <= TRUE
 }
 
-func (t Token)IsUnary() bool {
-	return t.TokenType == BANG || t.TokenType == NEG 
+func (t Token) IsUnary() bool {
+	return t.TokenType == BANG || t.TokenType == NEG
 }
 
-func (t Token)IsBool() bool {
+func (t Token) IsBool() bool {
 	return t.TokenType == TRUE || t.TokenType == FALSE
 }
 
-func (t Token)IsNum() bool {
+func (t Token) IsNum() bool {
 	return t.TokenType == INT || t.TokenType == FLOAT
 }
 
-func (t TokenType)String() string{
+func (t TokenType) String() string {
 	switch t {
 	case None:
 		return "None"
@@ -184,4 +184,3 @@ func (t TokenType)String() string{
 	}
 	return ""
 }
-

@@ -9,30 +9,30 @@ import (
 	"github.com/Pyr0de/pod-interpreter/cmd/token"
 )
 
-func Evaluate(in_group group.Group) (token.Token, bool){
+func Evaluate(in_group group.Group) (token.Token, bool) {
 	if group1, ok := in_group.Operand1.(*group.Group); ok {
-		g, err :=  Evaluate(*group1)
+		g, err := Evaluate(*group1)
 		if err {
 			return token.Token{}, true
 		}
 		in_group.Operand1 = g
-	}else if _, ok := in_group.Operand1.(token.Token); !ok {
+	} else if _, ok := in_group.Operand1.(token.Token); !ok {
 		panic("Error evaluating operand 1")
 	}
-	
-	if !in_group.Operator.IsUnary() && in_group.Operator.TokenType != token.None{
+
+	if !in_group.Operator.IsUnary() && in_group.Operator.TokenType != token.None {
 
 		if group2, ok := in_group.Operand2.(*group.Group); ok {
-			g, err :=  Evaluate(*group2)
+			g, err := Evaluate(*group2)
 			if err {
 				return token.Token{}, true
 			}
 			in_group.Operand2 = g
-		}else if _, ok := in_group.Operand2.(token.Token); !ok {
+		} else if _, ok := in_group.Operand2.(token.Token); !ok {
 			panic("Error evaluating operand 2")
 		}
 	}
-	
+
 	t1, ok1 := in_group.Operand1.(token.Token)
 	if t1.TokenType == token.IDENTIFIER {
 		op, err := env.GetVar(t1.Raw)
@@ -42,7 +42,7 @@ func Evaluate(in_group group.Group) (token.Token, bool){
 			return token.Token{}, true
 		}
 		t1 = op
-	}else if t1.IsBool() {
+	} else if t1.IsBool() {
 		t1.Value = t1.TokenType == token.TRUE
 	}
 	if in_group.Operator.TokenType == token.None {
@@ -58,7 +58,7 @@ func Evaluate(in_group group.Group) (token.Token, bool){
 			return token.Token{}, true
 		}
 		t2 = op
-	}else if t2.IsBool() {
+	} else if t2.IsBool() {
 		t2.Value = t2.TokenType == token.TRUE
 	}
 	if !ok1 || (!ok2 && in_group.Operand2 != nil) {
@@ -82,219 +82,236 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 	res_type := token.None
 
 	switch operator.TokenType {
-	case token.EQUAL_EQUAL:{
-		operand1.Value = operand1.Value == operand2.Value
-		if operand1.Value.(bool) {
-			res_type = token.TRUE
-		}else {
-			res_type = token.FALSE
-		}
-	}
-	case token.BANG:{
-		switch operand1.TokenType {
-		case token.TRUE, token.FALSE: {
-			operand1.Value = !operand1.Value.(bool)
+	case token.EQUAL_EQUAL:
+		{
+			operand1.Value = operand1.Value == operand2.Value
 			if operand1.Value.(bool) {
 				res_type = token.TRUE
-			}else {
+			} else {
 				res_type = token.FALSE
 			}
 		}
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
-		}
-	}
-	case token.BANG_EQUAL:{
-		operand1.Value = operand1.Value != operand2.Value
-		if operand1.Value.(bool) {
-			res_type = token.TRUE
-		}else {
-			res_type = token.FALSE
-		}
-	}
-	case token.LESS:{
-		switch operand1.TokenType {
-		case token.NUMBER:
-			operand1.Value = operand1.Value.(float64) < operand2.Value.(float64)
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
-		}
-		if operand1.Value.(bool) {
-			res_type = token.TRUE
-		}else {
-			res_type = token.FALSE
-		}
-	}
-	case token.LESS_EQUAL:{
-		switch operand1.TokenType {
-		case token.NUMBER:
-			operand1.Value = operand1.Value.(float64) <= operand2.Value.(float64)
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
-		}
-		if operand1.Value.(bool) {
-			res_type = token.TRUE
-		}else {
-			res_type = token.FALSE
-		}
-	}
-	case token.GREATER:{
-		switch operand1.TokenType {
-		case token.NUMBER:
-			operand1.Value = operand1.Value.(float64) > operand2.Value.(float64)
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
-		}
-		if operand1.Value.(bool) {
-			res_type = token.TRUE
-		}else {
-			res_type = token.FALSE
-		}
-	}
-	case token.GREATER_EQUAL:{
-		switch operand1.TokenType {
-		case token.NUMBER:
-			operand1.Value = operand1.Value.(float64) >= operand2.Value.(float64)
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
-		}
-		if operand1.Value.(bool) {
-			res_type = token.TRUE
-		}else {
-			res_type = token.FALSE
-		}
-	}
-	case token.AND_AND:{
-		switch operand1.TokenType {
-		case token.TRUE, token.FALSE:
-			operand1.Value = operand1.Value.(bool) && operand2.Value.(bool)
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
-		}
-		if operand1.Value.(bool) {
-			res_type = token.TRUE
-		}else {
-			res_type = token.FALSE
-		}
-	}
-	case token.PIPE_PIPE:{
-		switch operand1.TokenType {
-		case token.TRUE, token.FALSE:
-			operand1.Value = operand1.Value.(bool) || operand2.Value.(bool)
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
-		}
-		if operand1.Value.(bool) {
-			res_type = token.TRUE
-		}else {
-			res_type = token.FALSE
-		}
-	}
-	case token.PLUS:{
-		switch operand1.TokenType {
-		case token.NUMBER:
-			operand1.Value = operand1.Value.(float64) + operand2.Value.(float64)
-			res_type = token.NUMBER
-		case token.STRING:
-			operand1.Value = operand1.Value.(string) + operand2.Value.(string)
-			res_type = token.STRING
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
-		}
-	}
-	case token.MINUS:{
-		switch operand1.TokenType {
-		case token.NUMBER:
-			operand1.Value = operand1.Value.(float64) - operand2.Value.(float64)
-			res_type = token.NUMBER
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
-		}
-	}
-	case token.NEG:{
-		switch operand1.TokenType {
-		case token.NUMBER:
-			operand1.Value = -1 * operand1.Value.(float64)
-			res_type = token.NUMBER
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
-		}
-	}
-	case token.STAR:{
-		switch operand1.TokenType {
-		case token.NUMBER:
-			operand1.Value = operand1.Value.(float64) * operand2.Value.(float64)
-			res_type = token.NUMBER
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
-		}
-	}
-	case token.SLASH:{
-		switch operand1.TokenType {
-		case token.NUMBER:
-			if operand2.Value.(float64) == 0.0 {
-				fmt.Fprintf(os.Stderr, "Error: Cannot divide by zero\n")
+	case token.BANG:
+		{
+			switch operand1.TokenType {
+			case token.TRUE, token.FALSE:
+				{
+					operand1.Value = !operand1.Value.(bool)
+					if operand1.Value.(bool) {
+						res_type = token.TRUE
+					} else {
+						res_type = token.FALSE
+					}
+				}
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
 				return token.Token{}
 			}
-			operand1.Value = operand1.Value.(float64) / operand2.Value.(float64)
-			res_type = token.NUMBER
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
 		}
-	}
-	case token.PERCENT:{
-		switch operand1.TokenType {
-		case token.NUMBER:
-			panic("not implemented")
-			//operand1.Value = operand1.Value.(float64) % operand2.Value.(float64)
-			//res_type = token.NUMBER
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
+	case token.BANG_EQUAL:
+		{
+			operand1.Value = operand1.Value != operand2.Value
+			if operand1.Value.(bool) {
+				res_type = token.TRUE
+			} else {
+				res_type = token.FALSE
+			}
 		}
-	}
-	case token.CARET:{
-		switch operand1.TokenType {
-		case token.NUMBER:
-			panic("not implemented")
-			//v, ok := int(operand2.Value.(float64))
-			//if !ok {
-			//	//fmt.Fprintf(os.Stderr, "Error: Cannot divide by zero\n")
-			//	return token.Token{}
-			//}
-			//operand1.Value = operand1.Value.(float64)  operand2.Value.(float64)
-			//res_type = token.NUMBER
-		default:
-			fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
-				operator.Raw, operand1.TokenType)
-			return token.Token{}
+	case token.LESS:
+		{
+			switch operand1.TokenType {
+			case token.NUMBER:
+				operand1.Value = operand1.Value.(float64) < operand2.Value.(float64)
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
+				return token.Token{}
+			}
+			if operand1.Value.(bool) {
+				res_type = token.TRUE
+			} else {
+				res_type = token.FALSE
+			}
 		}
-	}
+	case token.LESS_EQUAL:
+		{
+			switch operand1.TokenType {
+			case token.NUMBER:
+				operand1.Value = operand1.Value.(float64) <= operand2.Value.(float64)
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
+				return token.Token{}
+			}
+			if operand1.Value.(bool) {
+				res_type = token.TRUE
+			} else {
+				res_type = token.FALSE
+			}
+		}
+	case token.GREATER:
+		{
+			switch operand1.TokenType {
+			case token.NUMBER:
+				operand1.Value = operand1.Value.(float64) > operand2.Value.(float64)
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
+				return token.Token{}
+			}
+			if operand1.Value.(bool) {
+				res_type = token.TRUE
+			} else {
+				res_type = token.FALSE
+			}
+		}
+	case token.GREATER_EQUAL:
+		{
+			switch operand1.TokenType {
+			case token.NUMBER:
+				operand1.Value = operand1.Value.(float64) >= operand2.Value.(float64)
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
+				return token.Token{}
+			}
+			if operand1.Value.(bool) {
+				res_type = token.TRUE
+			} else {
+				res_type = token.FALSE
+			}
+		}
+	case token.AND_AND:
+		{
+			switch operand1.TokenType {
+			case token.TRUE, token.FALSE:
+				operand1.Value = operand1.Value.(bool) && operand2.Value.(bool)
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
+				return token.Token{}
+			}
+			if operand1.Value.(bool) {
+				res_type = token.TRUE
+			} else {
+				res_type = token.FALSE
+			}
+		}
+	case token.PIPE_PIPE:
+		{
+			switch operand1.TokenType {
+			case token.TRUE, token.FALSE:
+				operand1.Value = operand1.Value.(bool) || operand2.Value.(bool)
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
+				return token.Token{}
+			}
+			if operand1.Value.(bool) {
+				res_type = token.TRUE
+			} else {
+				res_type = token.FALSE
+			}
+		}
+	case token.PLUS:
+		{
+			switch operand1.TokenType {
+			case token.NUMBER:
+				operand1.Value = operand1.Value.(float64) + operand2.Value.(float64)
+				res_type = token.NUMBER
+			case token.STRING:
+				operand1.Value = operand1.Value.(string) + operand2.Value.(string)
+				res_type = token.STRING
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
+				return token.Token{}
+			}
+		}
+	case token.MINUS:
+		{
+			switch operand1.TokenType {
+			case token.NUMBER:
+				operand1.Value = operand1.Value.(float64) - operand2.Value.(float64)
+				res_type = token.NUMBER
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
+				return token.Token{}
+			}
+		}
+	case token.NEG:
+		{
+			switch operand1.TokenType {
+			case token.NUMBER:
+				operand1.Value = -1 * operand1.Value.(float64)
+				res_type = token.NUMBER
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
+				return token.Token{}
+			}
+		}
+	case token.STAR:
+		{
+			switch operand1.TokenType {
+			case token.NUMBER:
+				operand1.Value = operand1.Value.(float64) * operand2.Value.(float64)
+				res_type = token.NUMBER
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
+				return token.Token{}
+			}
+		}
+	case token.SLASH:
+		{
+			switch operand1.TokenType {
+			case token.NUMBER:
+				if operand2.Value.(float64) == 0.0 {
+					fmt.Fprintf(os.Stderr, "Error: Cannot divide by zero\n")
+					return token.Token{}
+				}
+				operand1.Value = operand1.Value.(float64) / operand2.Value.(float64)
+				res_type = token.NUMBER
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
+				return token.Token{}
+			}
+		}
+	case token.PERCENT:
+		{
+			switch operand1.TokenType {
+			case token.NUMBER:
+				panic("not implemented")
+				//operand1.Value = operand1.Value.(float64) % operand2.Value.(float64)
+				//res_type = token.NUMBER
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
+				return token.Token{}
+			}
+		}
+	case token.CARET:
+		{
+			switch operand1.TokenType {
+			case token.NUMBER:
+				panic("not implemented")
+				//v, ok := int(operand2.Value.(float64))
+				//if !ok {
+				//	//fmt.Fprintf(os.Stderr, "Error: Cannot divide by zero\n")
+				//	return token.Token{}
+				//}
+				//operand1.Value = operand1.Value.(float64)  operand2.Value.(float64)
+				//res_type = token.NUMBER
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot use operator \"%s\" on type %s\n",
+					operator.Raw, operand1.TokenType)
+				return token.Token{}
+			}
+		}
 
 	}
 	if res_type == token.None {
@@ -304,9 +321,8 @@ func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token
 	operand1.TokenType = res_type
 	if operator.IsUnary() {
 		operand1.Raw = "(" + operator.Raw + operand1.Raw + ")"
-	}else {
+	} else {
 		operand1.Raw = "(" + operand1.Raw + operator.Raw + operand2.Raw + ")"
 	}
 	return operand1
 }
-

@@ -1,12 +1,13 @@
 //go:build wasm
+
 package main
 
 import (
 	"syscall/js"
 )
 
-func run(this js.Value, p[]js.Value) any {
-	
+func run(this js.Value, p []js.Value) any {
+
 	t := p[0].String()
 	file := p[1].String()
 
@@ -15,9 +16,9 @@ func run(this js.Value, p[]js.Value) any {
 }
 
 func main() {
-    c := make(chan struct{}, 0)
+	c := make(chan struct{}, 0)
 
-    js.Global().Set("run", js.FuncOf(run))
+	js.Global().Set("run", js.FuncOf(run))
 
-    <-c
+	<-c
 }

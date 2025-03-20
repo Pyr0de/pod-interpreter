@@ -10,7 +10,7 @@ import (
 	"github.com/Pyr0de/pod-interpreter/cmd/token"
 )
 
-func (s StmtPrint)Run() bool {
+func (s StmtPrint) Run() bool {
 	v, err := eval.Evaluate(s.Expression)
 	if err {
 		return true
@@ -19,7 +19,7 @@ func (s StmtPrint)Run() bool {
 	return false
 }
 
-func (s StmtAssign)Run() bool {
+func (s StmtAssign) Run() bool {
 	g, ok := s.Expression.Operand2.(*group.Group)
 	if !ok {
 		t, ok := s.Expression.Operand2.(token.Token)
@@ -45,13 +45,13 @@ func initVar(in_group any, val token.Token, init bool) {
 	if t, ok := in_group.(token.Token); ok {
 		if init {
 			env.InitVar(t.Raw, val)
-		}else {
+		} else {
 			err := env.SetVar(t.Raw, val)
 			if err {
 				fmt.Fprintf(os.Stderr, "[line %d] Error: Uninitialized variable \"%s\"\n", t.Line, t.Raw)
 			}
 		}
-	}else {
+	} else {
 		g, ok := in_group.(*group.Group)
 		if !ok {
 			panic("in_group is not token/group")
@@ -61,13 +61,13 @@ func initVar(in_group any, val token.Token, init bool) {
 	}
 }
 
-func (s StmtExpression)Run() bool {
+func (s StmtExpression) Run() bool {
 	val, err := eval.Evaluate(s.Expression)
 	fmt.Printf("[line %d] >> %s\n", val.Line, val.String())
 	return err
 }
 
-func (s StmtBlock)Run() bool {
+func (s StmtBlock) Run() bool {
 	env.NextScope()
 	for _, v := range s.Block {
 		e := v.Statement.Run()
@@ -80,7 +80,7 @@ func (s StmtBlock)Run() bool {
 	return false
 }
 
-func (s StmtIf)Run() bool {
+func (s StmtIf) Run() bool {
 	v, err := eval.Evaluate(s.Expression)
 	b, ok := v.Value.(bool)
 	if err || !v.IsBool() || !ok {
@@ -89,7 +89,7 @@ func (s StmtIf)Run() bool {
 	}
 	if b {
 		return s.Block.Run()
-	}else {
+	} else {
 		if s.Else != nil {
 			return s.Else.Run()
 		}
@@ -97,7 +97,7 @@ func (s StmtIf)Run() bool {
 	return false
 }
 
-func (s StmtWhile)Run() bool {
+func (s StmtWhile) Run() bool {
 	for {
 		v, err := eval.Evaluate(s.Expression)
 		b, ok := v.Value.(bool)
@@ -117,7 +117,7 @@ func (s StmtWhile)Run() bool {
 	return false
 }
 
-func (s StmtFor)Run() bool {
+func (s StmtFor) Run() bool {
 	e := false
 	if assign, ok := s.Initialization.Statement.(StmtAssign); ok {
 		e = assign.Run()
@@ -155,14 +155,14 @@ func (s StmtFor)Run() bool {
 	return false
 }
 
-func (s StmtFunc)Run() bool {
+func (s StmtFunc) Run() bool {
 	return env.InitFunc(s.Name.Raw, token.Token{
 		TokenType: token.FUNC, Value: &s, Line: s.Name.Line,
 	})
 
 }
 
-func (s StmtFuncCall)Run() bool {
+func (s StmtFuncCall) Run() bool {
 	e := env.FindFunc(s.Name.Raw)
 	if e == nil {
 		// function not found
@@ -178,7 +178,7 @@ func (s StmtFuncCall)Run() bool {
 	if len(f.Parameters) != len(s.Parameters) {
 		fmt.Printf(
 			"[line %d] Error: Mismatched number of parameters "+
-			"expected %d parameters, found %d parameters\n",
+				"expected %d parameters, found %d parameters\n",
 			s.Name.Line, len(f.Parameters), len(s.Parameters),
 		)
 		return true
@@ -194,7 +194,7 @@ func (s StmtFuncCall)Run() bool {
 
 	new_env := env.NewEnv()
 	new_env.Global = func_entry.Env
-	
+
 	prev_env := env.SwapEnv(new_env)
 
 	for i := range len(s.Parameters) {
@@ -202,11 +202,11 @@ func (s StmtFuncCall)Run() bool {
 	}
 
 	f.Block.Run()
-	
+
 	env.SwapEnv(prev_env)
 	return false
 }
 
-func (_ StmtEmpty)Run() bool {
+func (_ StmtEmpty) Run() bool {
 	return false
 }

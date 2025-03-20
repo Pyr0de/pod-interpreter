@@ -7,7 +7,7 @@ import (
 )
 
 type Stmt struct {
-	Stype token.TokenType
+	Stype     token.TokenType
 	Statement StmtRun
 }
 
@@ -21,7 +21,7 @@ type StmtPrint struct {
 
 type StmtAssign struct {
 	Expression group.Group
-	Init bool
+	Init       bool
 }
 
 type StmtExpression struct {
@@ -34,32 +34,32 @@ type StmtBlock struct {
 
 type StmtIf struct {
 	Expression group.Group
-	Block StmtBlock
-	Else *StmtIf
+	Block      StmtBlock
+	Else       *StmtIf
 }
 
 type StmtWhile struct {
 	Expression group.Group
-	Block StmtBlock
+	Block      StmtBlock
 }
 
 type StmtFor struct {
 	Initialization Stmt
-	Condition group.Group
-	Step Stmt
-	Block StmtBlock
+	Condition      group.Group
+	Step           Stmt
+	Block          StmtBlock
 }
 
 type StmtFunc struct {
-	Name token.Token
+	Name       token.Token
 	Parameters []token.Token
-	Block StmtBlock
-	Env *env.Environment
+	Block      StmtBlock
+	Env        *env.Environment
 }
 
 type StmtFuncCall struct {
-	Name token.Token
+	Name       token.Token
 	Parameters []group.Group
 }
 
-type StmtEmpty struct {}
+type StmtEmpty struct{}
