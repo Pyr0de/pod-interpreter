@@ -38,6 +38,8 @@ const (
 	CARET
 
 	STRING
+	INT
+	FLOAT
 	NUMBER
 
 	IDENTIFIER
@@ -97,6 +99,10 @@ func (t Token)IsBool() bool {
 	return t.TokenType == TRUE || t.TokenType == FALSE
 }
 
+func (t Token)IsNum() bool {
+	return t.TokenType == INT || t.TokenType == FLOAT
+}
+
 func (t TokenType)String() string{
 	switch t {
 	case None:
@@ -149,8 +155,10 @@ func (t TokenType)String() string{
 		return "CARET"
 	case STRING:
 		return "STRING"
-	case NUMBER:
-		return "NUMBER"
+	case INT:
+		return "INT"
+	case FLOAT:
+		return "FLOAT"
 	case IDENTIFIER:
 		return "IDENTIFIER"
 	case FALSE:

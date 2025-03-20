@@ -18,18 +18,31 @@ func Tokenize(input string) ([]token.Token, error) {
 	for i := 0; i < len(input); i++ {
 		start := i
 		c := input[i]
+		is_int := true
 
 		if c >= '0' && c <= '9' {
 			i++
 			for (input[i] >= '0' && input[i] <= '9') || input[i] == '.' {
+				if input[i] == '.' {
+					is_int = false
+				}
 				i++
 			}
 			i--
-			val, err := strconv.ParseFloat(input[start:i+1], 64)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "[line %d] Improper Number: %s\n", line, input[start:i+1])
+			if is_int {
+				int, err := strconv.ParseInt(input[start: i+1], 10, 64)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "[line %d] Improper Number: %s\n", line, input[start:i+1])
+					continue
+				}
+				tokens = append(tokens, token.Token{TokenType: token.INT, Raw: input[start:i+1], Value: int, Line: line})
 			}else {
-				tokens = append(tokens, token.Token{TokenType: token.NUMBER, Raw: input[start:i+1], Value: val, Line: line})
+				float, err := strconv.ParseFloat(input[start: i+1], 64)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "[line %d] Improper Number: %s\n", line, input[start:i+1])
+					continue
+				}
+				tokens = append(tokens, token.Token{TokenType: token.FLOAT, Raw: input[start:i+1], Value: float, Line: line})
 			}
 			continue
 		}
