@@ -7,7 +7,7 @@ out_file = os.path.join("out", "build", "examples", "example_index.json")
 file_info = []
 
 for i in os.listdir("examples"):
-    if not i.endswith(".pod"):
+    if not i.endswith(".pod") and not i.endswith(".pd"):
         continue
     path = os.path.join("examples", i)
     file = open(path, "r")

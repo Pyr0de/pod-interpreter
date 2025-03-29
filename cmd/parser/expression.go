@@ -81,7 +81,7 @@ func precedence(t token.Token) uint {
 		return 7
 	} else if t.TokenType == token.CARET {
 		return 6
-	} else if t.TokenType >= token.STAR && t.TokenType <= token.PERCENT{
+	} else if t.TokenType >= token.STAR && t.TokenType <= token.PERCENT {
 		return 5
 	} else if t.TokenType >= token.PLUS && t.TokenType <= token.MINUS {
 		return 4
@@ -89,7 +89,7 @@ func precedence(t token.Token) uint {
 		return 3
 	} else if t.TokenType == token.EQUAL {
 		return 2
-	}else if t.TokenType >= token.AND_AND && t.TokenType <= token.PIPE_PIPE {
+	} else if t.TokenType >= token.AND_AND && t.TokenType <= token.PIPE_PIPE {
 		return 1
 	}
 	return 0

@@ -11,13 +11,13 @@ const OPERATOR_FILE = "cmd/eval/generated-operators.go"
 
 func OperatorGen() (string, error) {
 	operators := []string{
-		case_operator("token.LESS", case_number("<")), 
+		case_operator("token.LESS", case_number("<")),
 		case_operator("token.LESS_EQUAL", case_number("<=")),
 		case_operator("token.GREATER", case_number(">")),
 		case_operator("token.GREATER_EQUAL", case_number(">=")),
 		case_operator("token.AND_AND", case_bool("&&")),
 		case_operator("token.PIPE_PIPE", case_bool("||")),
-		case_operator("token.PLUS", case_number("+") + case_string("+")),
+		case_operator("token.PLUS", case_number("+")+case_string("+")),
 		case_operator("token.MINUS", case_number("-")),
 		case_operator("token.STAR", case_number("*")),
 		pre_case_operator("token.SLASH", case_number("/"), divide_zero()),
