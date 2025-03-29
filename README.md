@@ -82,6 +82,6 @@ Web server starts at localhost:8080. Web interpreter files can be found in `./ou
 ### If and loops
 `if`, `else`, `for`, `while`
 ### Data types
-`string`, `number`, `true/false`
+`string`, `int`, `float`, `true/false`
 ### Other
 `;`, `(`, `)`, `{`, `}`

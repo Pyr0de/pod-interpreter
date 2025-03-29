@@ -32,14 +32,14 @@ func Tokenize(input string) ([]token.Token, error) {
 			if is_int {
 				int, err := strconv.ParseInt(input[start:i+1], 10, 64)
 				if err != nil {
-					fmt.Fprintf(os.Stderr, "[line %d] Improper Number: %s\n", line, input[start:i+1])
+					fmt.Fprintf(os.Stderr, "[line %d] Improper Int: %s\n", line, input[start:i+1])
 					continue
 				}
 				tokens = append(tokens, token.Token{TokenType: token.INT, Raw: input[start : i+1], Value: int, Line: line})
 			} else {
 				float, err := strconv.ParseFloat(input[start:i+1], 64)
 				if err != nil {
-					fmt.Fprintf(os.Stderr, "[line %d] Improper Number: %s\n", line, input[start:i+1])
+					fmt.Fprintf(os.Stderr, "[line %d] Improper Float: %s\n", line, input[start:i+1])
 					continue
 				}
 				tokens = append(tokens, token.Token{TokenType: token.FLOAT, Raw: input[start : i+1], Value: float, Line: line})
