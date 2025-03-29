@@ -41,7 +41,16 @@ clean_output() {
 }
 
 build() {
+	# Code Gen
 	echo -ne "$(color $BOLD $RED)"
+	go run ./cmd/code-gen
+	exit_code=$?
+	echo -ne "$(color)"
+	if [[ $exit_code -ne 0 ]]; then
+		exit $exit_code
+	fi
+
+	# Build actual binary
 	go build -o $OUT_BUILD_PATH ./cmd/pod-interpreter
 	exit_code=$?
 	echo -ne "$(color)"

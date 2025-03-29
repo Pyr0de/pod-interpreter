@@ -1,0 +1,74 @@
+package eval
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/Pyr0de/pod-interpreter/cmd/token"
+)
+
+func eval_token(operator token.Token, operand1 token.Token, operand2 token.Token) token.Token {
+
+	switch operator.TokenType {
+	case token.EQUAL_EQUAL:
+		operand1.Value = operand1.Value == operand2.Value
+	case token.BANG_EQUAL:
+		operand1.Value = operand1.Value != operand2.Value
+	case token.BANG:
+		{
+			switch operand1.TokenType {
+			case token.TRUE, token.FALSE:
+				operand1.Value = !operand1.Value.(bool)
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot operator on \"%s %s\"\n",
+					operator.Raw, operand1.Raw)
+				return token.Token{}
+			}
+		}
+	case token.NEG:
+		{
+			switch operand1.TokenType {
+			case token.INT:
+				operand1.Value = -1 * operand1.Value.(int64)
+			case token.FLOAT:
+				operand1.Value = -1 * operand1.Value.(float64)
+			default:
+				fmt.Fprintf(os.Stderr, "Cannot operator on \"%s %s\"\n",
+					operator.Raw, operand1.Raw)
+				return token.Token{}
+			}
+		}
+	//[[code-gen]]
+	default: 
+	{
+		fmt.Fprintf(os.Stderr, "Cannot operator on \"%s %s %s\"\n",
+			 operand1.Raw, operator.Raw, operand2.Raw)
+		return token.Token{}
+	}
+
+	}
+
+	switch operand1.Value.(type) {
+	case int64: operand1.TokenType = token.INT
+	case float64: operand1.TokenType = token.FLOAT
+	case string: operand1.TokenType = token.STRING
+	case bool: {
+		if operand1.Value.(bool) {
+			operand1.TokenType = token.TRUE
+		}else {
+			operand1.TokenType = token.FALSE
+		}
+	}
+	default: {
+		fmt.Fprintf(os.Stderr, "Result of operation %s %s %s is invalid\n", operand1, operator, operand2)
+		return token.Token{}
+	}
+	}
+
+	if operator.IsUnary() {
+		operand1.Raw = "(" + operator.Raw + operand1.Raw + ")"
+	} else {
+		operand1.Raw = "(" + operand1.Raw + operator.Raw + operand2.Raw + ")"
+	}
+	return operand1
+}
