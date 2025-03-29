@@ -1,4 +1,7 @@
 ExitCode: 66
-Cannot use operator "||" on type NUMBER
-Cannot use operator "&&" on type NUMBER
-Cannot use operator "!" on type NUMBER
+Cannot operator on "13.0 % 3"
+[line 27] Error: Cannot divide by zero
+[line 28] Error: Cannot divide by zero
+Cannot operator on "100 || 100"
+Cannot operator on "100 && 100"
+Cannot operator on "! 100"

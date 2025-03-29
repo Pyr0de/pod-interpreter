@@ -1,2 +1,2 @@
 ExitCode: 66
-Cannot use operator "+" on type TRUE
+Cannot operator on "true + true"
