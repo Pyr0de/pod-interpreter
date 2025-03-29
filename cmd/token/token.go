@@ -15,7 +15,11 @@ const (
 	SEMICOLON
 	COMMA
 
+	AND_AND
+	PIPE_PIPE
+
 	EQUAL
+
 	EQUAL_EQUAL
 	BANG
 	BANG_EQUAL
@@ -23,9 +27,6 @@ const (
 	LESS_EQUAL
 	GREATER
 	GREATER_EQUAL
-
-	AND_AND
-	PIPE_PIPE
 
 	PLUS
 	MINUS
@@ -83,7 +84,7 @@ func (t Token) Display() {
 }
 
 func (t Token) IsOperator() bool {
-	return t.TokenType >= EQUAL && t.TokenType <= CARET
+	return t.TokenType >= AND_AND && t.TokenType <= CARET
 }
 
 func (t Token) IsOperand() bool {

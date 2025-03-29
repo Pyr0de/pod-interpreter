@@ -77,17 +77,19 @@ func ParseExpression(tokens []token.Token) ([]group.Group, error) {
 }
 
 func precedence(t token.Token) uint {
-	if t.TokenType == token.CARET {
+	if t.IsUnary() {
+		return 7
+	} else if t.TokenType == token.CARET {
 		return 6
-	} else if t.IsUnary() {
+	} else if t.TokenType >= token.STAR && t.TokenType <= token.PERCENT{
 		return 5
-	} else if t.TokenType >= token.STAR && t.TokenType <= token.SLASH {
-		return 4
 	} else if t.TokenType >= token.PLUS && t.TokenType <= token.MINUS {
+		return 4
+	} else if t.TokenType >= token.EQUAL_EQUAL && t.TokenType <= token.GREATER_EQUAL {
 		return 3
-	} else if t.TokenType >= token.EQUAL_EQUAL && t.TokenType <= token.PIPE_PIPE {
-		return 2
 	} else if t.TokenType == token.EQUAL {
+		return 2
+	}else if t.TokenType >= token.AND_AND && t.TokenType <= token.PIPE_PIPE {
 		return 1
 	}
 	return 0
